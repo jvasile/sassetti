@@ -1,4 +1,4 @@
-(in-package :org.hackervisions.sassetti)
+(in-package :sassetti)
 
 (def-suite sassetti-test :description "Test Suite for Sasetti")
 (in-suite sassetti-test)
