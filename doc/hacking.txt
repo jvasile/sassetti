@@ -1,0 +1,10 @@
+# Hacking
+
+I'm using the FiveAM testing framework to keep the code well-covered
+by tests in test.lisp.  To accomplish this, I am writing tests as I
+write code and will not consider a bug closed until it is accompanied
+by appropriate tests.
+
+If you are interested in helping out, writing tests is a great place
+to start-- you don't need to know much about the code or lisp to write
+useful tests.

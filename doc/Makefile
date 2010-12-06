@@ -3,7 +3,7 @@ PDFLATEX=`which pdflatex`
 
 # List text files in the order in which you want them to appear in the
 # complete manual:
-SOURCES=README.txt INSTALL.txt COPYING.txt colophon.txt
+SOURCES=README.txt INSTALL.txt hacking.txt COPYING.txt colophon.txt
 
 HTML=sassetti.html $(patsubst %.txt,%.html,$(wildcard *.txt))
 LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(wildcard *.txt))

@@ -16,11 +16,15 @@ it.  On my box, I do:
 All of the following must be present via quickload.  Fortunately, they
 are all in the standard Quicklisp distribution.
 
+* Sassetti relies on Quicklisp to load dependencies (and itself), so
+  make sure quicklisp is loaded before sassetti, either automatically
+  or manually.
+
 * Parsing ledger formatted files depends on regular expressions, so
   cl-ppcre needs to be present.
 
 * We use FiveAm for testing.  You can comment it out in the source if
-you aren't interested in the unit tests.
+  you aren't interested in the unit tests.
 
 * We have a dependency on iterate, but we don't actually use it yet.
 
@@ -53,6 +57,7 @@ Then load Sassetti
 
     (ql:quickload 'sassetti)
 
-Or, using sbcl from the commandline
+Once Sassetti is loaded, you can invoke it or use any of its
+subroutines.
 
-    sbcl --eval "(ql:quickload 'sassetti)"
+    (sassetti:sassetti)

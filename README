@@ -1,6 +1,15 @@
 # Introduction
 
 Sassetti is a Common Lisp reimplementation of John Wiegley's
-commandline ledger program.  The goal is to harness the power of
+commandline Ledger program.  The goal is to harness the power of
 Wiegley's simple tools and extend them with the flexibility of lisp.
+
+## Overview
+
+Sassetti is designed to read Ledger files and do with them exactly
+what ledger would, except for a few minor variations.  First, Sassetti
+is in some places more forgiving than Ledger about spacing.  Second,
+and more importantly, Sassetti allows you to include lisp commands
+among your standard Ledger entries.  These get evaluated by Sassetti,
+perhaps generating new entries or changing how data is interpreted.
 
