@@ -38,7 +38,7 @@ pdf: $(PDF)
 ###############################################################################
 
 clean-latex:
-	rm -rf *.log *.out *.aux
+	rm -rf *.log *.out *.aux *.toc
 
 clean: clean-latex
 	rm -rf $(PDF) $(LATEX) $(HTML)
