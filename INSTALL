@@ -11,8 +11,8 @@ it.  On my box, I do:
 
     ln -s ~/src/list/sassetti/sassetti.asd ~/quicklisp/quicklisp/
 
-Now you can [run Sassetti](#running_sassetti) from there or make an executable version of
-Sassetti with `make bin`.
+Now you can [run Sassetti](#running_sassetti) from there or make an
+executable version ("bin/sassetti") of Sassetti with `make bin`.
 
 ## Dependencies
 All of the following must be present via quickload.  Fortunately, they
