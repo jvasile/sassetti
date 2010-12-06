@@ -5,26 +5,26 @@ PDFLATEX=`which pdflatex`
 # complete manual:
 SOURCES=README.txt INSTALL.txt hacking.txt COPYING.txt colophon.txt
 
-HTML=sassetti.html $(patsubst %.txt,%.html,$(wildcard *.txt))
-LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(wildcard *.txt))
-PDF=sassetti.pdf $(patsubst %.txt,%.pdf,$(wildcard *.txt))
+HTML=sassetti.html $(patsubst %.txt,%.html,$(SOURCES))
+LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(SOURCES))
+PDF=sassetti.pdf $(patsubst %.txt,%.pdf,$(SOURCES))
 
 all: pdf html
 
 ###############################################################################
-$(SOURCES):
+$(SOURCES): 
 	ln -s ../`echo $@ | sed -e 's/.txt$$//'` $@
 ###############################################################################
 %.tex: %.txt Makefile
-	$(PANDOC) -s --toc -f markdown -t latex --standalone -o $@ $<
+	$(PANDOC) -s --toc -f markdown --standalone -o $@ $<
 
 sassetti.tex: $(SOURCES) Makefile
-	$(PANDOC) -s -o sassetti.tex -f markdown $(SOURCES)
+	$(PANDOC) -s --toc -f markdown -o sassetti.tex $(SOURCES)
 
 latex: $(LATEX)
 ###############################################################################
 %.html: %.txt Makefile header.html footer.html style.css
-	$(PANDOC) -s --toc -c style.css -f markdown -t html --standalone -o $@ header.html $< footer.html
+	$(PANDOC) -s --toc -c style.css -f markdown --standalone -o $@ header.html $< footer.html
 
 sassetti.html: $(SOURCES) Makefile
 	$(PANDOC) -s --toc -o sassetti.html -f markdown $(SOURCES)
@@ -33,6 +33,7 @@ html: $(HTML)
 ###############################################################################
 %.pdf: %.tex Makefile
 	$(PDFLATEX) $<
+	$(PDFLATEX) $<  # yes, do it twice so the toc works
 
 pdf: $(PDF)
 ###############################################################################
@@ -42,6 +43,4 @@ clean-latex:
 
 clean: clean-latex
 	rm -rf $(PDF) $(LATEX) $(HTML)
-
-sterile: clean
 	rm -rf README.txt INSTALL.txt COPYING.txt
