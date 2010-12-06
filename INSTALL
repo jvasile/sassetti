@@ -30,34 +30,24 @@ are all in the standard Quicklisp distribution.
 
 * We use split-sequence for some text processing.
 
-* GNU make processes the Makefile, which allows us to assemble documentation.
+The documentation has some dependencies too.
+
+* GNU make processes the /docs Makefile.
+
+* Markdown is used to format and style docs.
+
+* Pandoc converts the markdown to different formats.
+
+* PDFLatex generates pdf versions of the documentation.
 
 ## Building the Documentation
 
-The first time you run make, you need to run it twice.  The first run
-sets up some symlinks that are needed for later operation.  It will
-also make some stunted versions of some of the docs.  The second run
-actually builds the good stuff.  
-
-After that first run, though, you should be able to build the
-documentation with just one invocation of make.
-
-    cd doc
-    make
-    make
+Documentation has been collected into a pdf that can be built using
+`make doc`.
 
 ## Running Sassetti
 
-Start your lisp environment using one of the following:
-
-    M-x slime (in emacs)
-    sbcl (at the commandline)
-
-Then load Sassetti
-
-    (ql:quickload 'sassetti)
-
+Start your lisp environment using `M-x slime` in emacs or `sbcl` at
+the commandline.  Then load Sassetti with `(ql:quickload 'sassetti)`
 Once Sassetti is loaded, you can invoke it or use any of its
-subroutines.
-
-    (sassetti:sassetti)
+subroutines as in `(sassetti:sassetti)`.
