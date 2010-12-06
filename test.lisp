@@ -119,14 +119,17 @@
   )
 
 (test parse-entry-line
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.")))
-    (is (equal T (cleared p)))
-    (is (equal T (pending p)))
-    (is (equal "2010-02-07" (string-form (date p))))
-    (is (equal "2010-02-14" (string-form (effective-date p))))
-    (is (equal "code" (code p)))
-    (is (equal "Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."
-	       (desc p))))
+  (is (equal (list "2010-02-07" "2010-02-14" 
+		   "Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."
+		   t t "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."))))
+  (is (equal (list "2010-02-07" "2010-02-14" 
+		   "Description of transaction."
+		   t t "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 *! (code) Description of transaction."))))
+
   (let ((p (parse-entry-line "2010/2/7=2010/2/14 *! (code)Description of transaction.")))
     (is (equal T (cleared p)))
     (is (equal T (pending p)))

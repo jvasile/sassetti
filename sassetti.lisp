@@ -26,7 +26,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgeneric get-as-list (object)
-  (:documentation "Return the slots of object as a list.  This is useful for testing"))
+  (:documentation "Return the slots of object as a list.  This is
+  useful for testing because it allows you to test all of an object's
+  slots with one test.  This greatly speeds up the running of
+  tests."))
 (defgeneric string-form (object)
   (:documentation "Return the object in ledger-format string form."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -167,8 +170,17 @@
    (cleared :accessor cleared :initarg :cleared)
    (pending :accessor pending :initarg :pending)
    (code :accessor code :initarg :code)
-   (transactions :accessor transactions)
+   (transactions :accessor transactions :initform nil)
    ))
+
+(defmethod get-as-list ((self entry))
+  (list (string-form (date self))
+	(if (effective-date self) (string-form (effective-date self)) nil)
+	(desc self)
+	(cleared self)
+	(pending self)
+	(code self)
+	(transactions self)))
 
 (defun parse-entry-date (date)
   "Parse the date and any effective date.  Return two date objects,
