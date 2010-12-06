@@ -1,5 +1,0 @@
-\contentsline {section}{Quick Start}{1}{section*.2}
-\contentsline {subsection}{Installing Sassetti}{1}{section*.3}
-\contentsline {subsection}{Dependencies}{1}{section*.4}
-\contentsline {subsection}{Building the Documentation}{2}{section*.5}
-\contentsline {subsection}{Running Sassetti}{2}{section*.6}
