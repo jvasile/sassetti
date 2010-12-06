@@ -1,5 +1,20 @@
 ;;;; sassetti.lisp
-;(ql:quickload 'sassetti)
+;;;;
+;;;; Sassetti is a Common Lisp reimplementation of John Wiegley's
+;;;; commandline ledger program.  The goal is to harness the power of
+;;;; Wiegley's simple tools and extend them with the flexibility of
+;;;; lisp.
+;;;;
+;;;; See README and INSTALL for details.
+;;;;
+;;;; To load it, start slime (M-x slime), then evaluate this to load
+;;;; sassetti and its dependencies: (ql:quickload 'sassetti)
+;;;;
+;;;; To use this code:
+;;;; Set *ledger-fname* to the path of your ledger file
+;;;; Eval this (position point after s-expression, then C-x C-e): (preprocess-ledger-file *ledger-fname*)
+;;;; Now run ledger on the resulting ledger file.
+
 (in-package #:sassetti)
 
 (defvar *ledger-fname* "main.ledger.lisp" "Ledger file name")
