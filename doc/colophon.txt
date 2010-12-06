@@ -1,0 +1,7 @@
+# Colophon
+
+This manual was typed in emacs, formatted using markdown and converted
+to pdf, html and latex using pandoc and pdflatex.
+
+The complete source code to this manual is available in the 'doc'
+directory of the Sassetti distribution.
