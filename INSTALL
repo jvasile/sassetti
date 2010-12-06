@@ -32,15 +32,17 @@ are all in the standard Quicklisp distribution.
 
 * We use split-sequence for some text processing.
 
-The documentation has some dependencies too.
+* You'll need GNU Make for the Makefile
 
-* GNU make processes the /docs Makefile.
+The documentation has some dependencies too.
 
 * Markdown is used to format and style docs.
 
 * Pandoc converts the markdown to different formats.
 
 * PDFLatex generates pdf versions of the documentation.
+
+* GNU make processes /doc/Makefile.
 
 ## Building the Documentation
 
