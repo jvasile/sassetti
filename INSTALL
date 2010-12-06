@@ -11,8 +11,10 @@ it.  On my box, I do:
 
     ln -s ~/src/list/sassetti/sassetti.asd ~/quicklisp/quicklisp/
 
-## Dependencies
+Now you can [run Sassetti](#running_sassetti) from there or make an executable version of
+Sassetti with `make bin`.
 
+## Dependencies
 All of the following must be present via quickload.  Fortunately, they
 are all in the standard Quicklisp distribution.
 
@@ -45,9 +47,13 @@ The documentation has some dependencies too.
 Documentation has been collected into a pdf that can be built using
 `make doc`.
 
-## Running Sassetti
+
+
+<a name="running_sassetti" />
+
+## Running Sassetti 
 
 Start your lisp environment using `M-x slime` in emacs or `sbcl` at
-the commandline.  Then load Sassetti with `(ql:quickload 'sassetti)`
+the commandline.  Then load Sassetti with `(ql:quickload 'sassetti)`.
 Once Sassetti is loaded, you can invoke it or use any of its
 subroutines as in `(sassetti:sassetti)`.
