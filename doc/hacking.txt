@@ -8,3 +8,21 @@ by appropriate tests.
 If you are interested in helping out, writing tests is a great place
 to start-- you don't need to know much about the code or lisp to write
 useful tests.
+
+## Repository
+
+Sassetti is available from github at
+`git://github.com/jvasile/sassetti.git`.  The [project page on
+github](https://github.com/jvasile/sassetti) is at
+`https://github.com/jvasile/sassetti`.
+
+## Bugs
+
+Any place where Sassetti does something different from Ledger (except
+for being a little less strict in accepting input) is probably a bug.
+
+Any time lisp doesn't do the expected thing, it's also probably a bug.
+Sassetti should never crash and dump the user to the debugger.
+Unfortunately, I haven't put in any error handling yet, so crashes
+will result from malformed input.  That will change.
+
