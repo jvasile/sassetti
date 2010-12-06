@@ -44,4 +44,4 @@ clean: clean-latex
 	rm -rf $(PDF) $(LATEX) $(HTML)
 
 sterile: clean
-	rm -rf $(SOURCES)
+	rm -rf README.txt INSTALL.txt COPYING.txt
