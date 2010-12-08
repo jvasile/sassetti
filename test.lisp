@@ -17,6 +17,10 @@
 (def-suite string-form :description "Test the object class definitions" :in sassetti-test)
 (in-suite string-form)
 
+(test string-form-simple-cases
+  (is (equal "!!" (string-form "!!")))
+  (is (equal "" (string-form nil))))
+
 (test string-form-amount
   "Test string-form methods for various objects."
   (is (equal "5 HKD" (string-form (make-instance 'amount :quantity 5 :units-before "" :units-after " HKD"))))

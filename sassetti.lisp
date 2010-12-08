@@ -38,8 +38,8 @@
   (list object))
 (defgeneric string-form (object)
   (:documentation "Return the object in ledger-format string form."))
-(defmethod string-form ((object NULL))
-  "")
+(defmethod string-form ((object NULL))  "")
+(defmethod string-form ((object string)) object)
 (defgeneric units (object)
   (:documentation "Returns the units string of an object, trimmed of whitespace."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
