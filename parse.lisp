@@ -133,7 +133,7 @@
   (let* ((lines (split-sequence:split-sequence #\Newline entry))
 	(entry (parse-entry-line (pop lines))))
     (setf (transactions entry) (mapcar (lambda (line) (parse-transaction line)) lines))
-    ;entry
+    entry
     ))
 
 (defun parse-ledger-file (file-lines)
@@ -146,8 +146,3 @@
 		x));(parse-entry x)))
 	  file-lines))
 
-;(parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
-;    Expenses:Bureaucracy                                 $-359.00
-;    Liabilities:Due to/from Karl                         $179.50
-;    Liabilities:Due to/from James                        $-179.50
-;    Assets:Cash")

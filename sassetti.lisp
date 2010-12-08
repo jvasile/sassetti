@@ -124,7 +124,6 @@
 	(code self)
 	(mapcar 'get-as-list (transactions self))))
 (defmethod string-form ((self entry))
-  "TODO: handle transactions"
   (format nil "~a~a ~a~a~a~{~%~a~}" 
 	  (string-form (date self)) 
 	  (if (effective-date self)
@@ -137,7 +136,7 @@
 	      "")
 	  (if (code self) (format nil "(~a) " (code self)) "")
 	  (desc self)
-	  (mapcar 'string-format (transactions self))))
+	  (mapcar 'string-form (transactions self))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass ledger ()
   ((fname :accessor fname :initarg :fname)

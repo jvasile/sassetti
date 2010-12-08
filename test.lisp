@@ -184,6 +184,22 @@
 	      (parse-entry-line "2/7 *! Description of transaction (with parens)."))))
   )
 
+(test parse-entry 
+   (is (equal "2010-02-07=2010-02-14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
+   Expenses:Bureaucracy     $-359
+   Liabilities:Due to/from Karl     $179.50
+   Liabilities:Due to/from James     $-179.-50
+   Assets:Cash     "
+	      (string-form (parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
+    Expenses:Bureaucracy                                 $-359.00
+    Liabilities:Due to/from Karl                         $179.50
+    Liabilities:Due to/from James                        $-179.50
+    Assets:Cash"))))
+   (is (equal "2010-02-07=2010-02-14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."
+	      (string-form 
+	       (parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."))))
+  )
+
 (def-suite parse-amount :description "Test the parse-amount routines" :in parser)
 (in-suite parse-amount)
 
