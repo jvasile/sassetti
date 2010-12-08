@@ -93,12 +93,6 @@
 	  (string-form (unit-price self))
 	  (cat (if (equal "" (note self)) "" ";") (note self))
 	  ))
-
-(string-form (parse-transaction "  *! Expenses:Bureaucracy:Add a space       $-359.00 ;note"))
-
-(get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       $-359.00 ;note"))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass date ()
   ((year :accessor year :initarg :year :initform nil)
