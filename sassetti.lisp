@@ -16,12 +16,17 @@
 ;;;; Now run ledger on the resulting ledger file.
 ;;;;
 ;;;; Don't forget you can compile forms with C-c C-c
+;;;;
+;;;; Also, M-x slime-eval-buffer and M-x slime-compile-buffer might be
+;;;; useful, especially if you're getting useless asdf compile failure
+;;;; messages.
 
 ;(ql:quickload 'sassetti)
 (in-package #:sassetti)
 
 (defvar *ledger-fname* "main.ledger.lisp" "Ledger file name")
-(defconstant *newline* (string #\Newline) "Newline char in string form")
+(unless (symbolp 'newline)
+  (defconstant newline (string #\Newline) "Newline char in string form"))
 
 (defmacro cat (&rest strings) 
   "Concatenate string"
