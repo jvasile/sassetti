@@ -17,6 +17,7 @@
 ;;;;
 ;;;; Don't forget you can compile forms with C-c C-c
 
+;(ql:quickload 'sassetti)
 (in-package #:sassetti)
 
 (defvar *ledger-fname* "main.ledger.lisp" "Ledger file name")
@@ -25,6 +26,9 @@
 (defmacro cat (&rest strings) 
   "Concatenate string"
   `(concatenate 'string ,@strings))
+(defmacro trim-whitespace (s)
+  "Trim leading and trailing whitespace"
+  `(string-trim '(#\Space #\Tab #\Newline) ,s))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgeneric get-as-list (object)
@@ -32,79 +36,78 @@
   useful for testing because it allows you to test all of an object's
   slots with one test.  This greatly speeds up the running of
   tests."))
+(defmethod get-as-list ((object NULL))
+  (list object))
 (defgeneric string-form (object)
   (:documentation "Return the object in ledger-format string form."))
+(defgeneric units (object)
+  (:documentation "Returns the units string of an object, trimmed of whitespace."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defclass amount ()
-  ((units :accessor units :initarg :units :initform nil)
-   (commodity :accessor commodity :initarg :commodity :initform "")
-   (price :accessor price :initarg :price :initform 0)
-   (denomination :accessor denomination :initarg :denomination :initform ""))
-  (:documentation "An amount specified as units of a commodity at a unit price in a denominating currency."))
+(defclass amount()
+  ((quantity :accessor quantity :initarg :quantity :initform 0)
+   (units-before :accessor units-before :initarg :units-before :initform "")
+   (units-after :accessor units-after :initarg :units-after :initform ""))
+  (:documentation "An amount specified as a quantity of a commodity or
+  currency of units.  Units are specified as before or after,
+  depending on where labels are applied (e.g. $5 vs. 45 Euros).
+
+  units-before might have trailing whitespace.  units-after might have
+  leading whitespace.  Preserve in output so 5 Euros doesn't become
+  5Euros.  But do comparisons on trimmed strings so 5 HKD equals 5HKD.
+  "))
+(defmethod units ((self amount))
+  (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
 (defmethod string-form ((self amount))
-  (if (units self)
-      (format nil "~a ~a @ ~a~a"
-	      (units self)
-	      (commodity self)
-	      (denomination self)(price self))
-      (format nil "~a~a" (denomination self)(price self))))
-
-(defmethod get-as-list ((amt amount))
-  (list (price amt) (denomination amt) (units amt) (commodity amt)))
-
-(defun parse-amount-currency (s)
+  (cat (units-before self) (write-to-string (quantity self)) (units-after self)))
+(defmethod get-as-list ((self amount))
+  (list (units-before self) (quantity self) (units-after self)))
+(defun parse-amount (s)
   "Parse a portion of the amount that is a number and a symbol.
-  Return the number and the symbol, with leading/trailing whitespace
-  trimmed.  Use this to process either the currency or the commodity
-  part of the amount.
-
-  '50 AAPL' -=> 50, 'AAPL'
-  '$50' -=> 50, '$'
-  '20 HKD' -=> 20, 'HKD'"
+  Return an amount object with the number and symbol extracted
+  appropriately."
 
   (if (equal #\@ (char s 0))
-    (parse-amount-currency (subseq s 1))
+    (parse-amount (subseq s 1))
     (let* ((price (scan-to-strings "(-?[,.\\d]+)\\s*$" s))
-	   (denomination (subseq s 0 (- (length s) (length price)))))
+	   (units-before (subseq s 0 (- (length s) (length price))))
+	   (units-after ""))
       (unless price
 	(setf price (scan-to-strings "^\\s*(-?[,.\\d]+)" s))
-	(setf denomination (subseq s (length price) (length s))))
+	(setf units-after (subseq s (length price) (length s)))
+	(setf units-before ""))
       (setf price (or price "0"))
-      (values (if (equal price ".") 
-		  0
-		  (read-from-string (remove #\, price)))
-	      (string-trim '(#\Space #\Tab #\Newline) denomination)))))
-
-(defun parse-amount (s)
-  "Accept a string like '$3502' or '-23 Euros' or '22 Martian Dollars'.
-  Returns an amount object with the units, commodity and unit-price
-  set from values extracted from the string.  Leading and trailing
-  whitespace will be trimmed as needed."
-  ;(if (find #\t "The Hyperspec contains approximately 110,000 hyperlinks." :test #'equal)
+      (make-instance 'amount 
+		     :quantity (if (equal price ".") 
+				   0
+				   (read-from-string (remove #\, price)))
+		     :units-before (regex-replace "^\\s*" units-before "")
+		     :units-after (regex-replace "\\s*$" units-after "")))))
+(defun parse-amount-complex (s)
+  "Accept a string like '$3502' or '-23 Euros' or '22 Martian Dollars'
+  or 'HKD 253.21'.  Returns an amount object with the quantity,
+  units-before and units-after set from values extracted from the
+  string.  Leading and trailing whitespace will be trimmed as needed.
+  "
   (let ((at-pos (position #\@ s))
-	(units) (commodity) (price) (denomination))
+	(units) (unit-price nil))
     (if at-pos
 	(progn
-	  (multiple-value-setq (price denomination) (parse-amount-currency (subseq s (+ 1 at-pos))))
-	  (multiple-value-setq (units commodity) (parse-amount-currency (subseq s 0 at-pos)))
-	  (when (scan "@@" s) (setf price (/ price units)))
-	  (make-instance 'amount
-			 :price price 
-			 :denomination denomination
-			 :units  units
-			 :commodity commodity))	
-	(progn
-	  (multiple-value-setq (price denomination) (parse-amount-currency s))
-	  (make-instance 'amount
-			 :price price
-			 :denomination denomination)))))
+	  (setf units (parse-amount (subseq s 0 at-pos)))
+	  (setf unit-price (parse-amount (subseq s (+ 1 at-pos))))
+	  (when (scan "@@" s) (setf (quantity unit-price) (/ (quantity unit-price) (quantity units))))
+	  )
+	(setf units (parse-amount s)))
+    (values units unit-price)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass transaction ()
-  ((account :accessor account :initarg :account :initform "")
-   (amount :accessor amount :initarg :amount )
-   (cleared :accessor cleared :initarg :cleared :initform nil)
-   (pending :accessor pending :initarg :pending :initform nil)
-   (note :accessor note :initarg :note :initform "")
+  ((account :accessor account :initarg :account)
+   (commodity :accessor commodity :initarg :commodity :initform nil) ;$30 is a commodity if no other commodity is specified
+   (unit-price :accessor unit-price :initarg :unit-price :initform nil);$30 is a unit price if another commodity is specified
+   (cleared :accessor cleared :initarg :cleared)
+   (pending :accessor pending :initarg :pending)
+   (note :accessor note :initarg :note)
    ))
 (defmethod get-as-list ((self transaction))
   (list (account self) (if (amount self) (get-as-list (amount self)) nil) (cleared self) (pending self) (note self)))
@@ -141,17 +144,23 @@
   TODO: do we need to trim leading space from the note?
   "
   (let ((parts (coerce (second (multiple-value-list (scan-to-strings "^\\s*([*!]*)\\s*(.*?)(\\s\\s+([^;]*);?(.*?))?$"
-								     line))) 'list)))
+								     line))) 'list))
+	(commodity) (unit-price))
+    (multiple-value-setq (commodity unit-price)
+      (if (equal "" (fourth parts))
+	  (values nil nil)
+	  (if (fourth parts)
+	      (parse-amount-complex (fourth  parts))
+	      (values nil nil))))
     (make-instance 'transaction 
 		   :account (second parts)
-		   :amount (if (equal "" (fourth parts))
-			       nil
-			       (if (fourth parts)
-				   (parse-amount (fourth  parts))
-				   nil))
+		   :commodity commodity
+		   :unit-price unit-price
 		   :cleared (not (equal (scan "\\*" (first parts)) nil))
 		   :pending (not (equal (scan "\\!" (first parts)) nil))
 		   :note (or (fifth parts) ""))))
+(defmethod get-as-list ((self transaction))
+  (list (account self) (get-as-list (commodity self)) (get-as-list (unit-price self)) (cleared self) (pending self) (note self)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass date ()
   ((year :accessor year :initarg :year :initform nil)
