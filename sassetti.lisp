@@ -120,15 +120,16 @@
 	(pending self)
 	(code self)
 	(transactions self)))
-(defmethod string-form-transactions ((self entry))
-  "Step through all the transactions in the transactions slot list and
-  return their string-forms joined by newlines."
-  "Transactions go here"
-  (
-  (string-form transaction
-  (apply #'concatenate  at (list "1" "2"))
-  (concatenate 'list 
-  )
+
+;(defmethod string-form-transactions ((self entry))
+;  "Step through all the transactions in the transactions slot list and
+;  return their string-forms joined by newlines."
+ ; "Transactions go here"
+;  (
+;  (string-form transaction
+;  (apply #'concatenate  at (list "1" "2"))
+;  (concatenate 'list 
+;  )
 (defmethod string-form ((self entry))
   "TODO: handle transactions"
   (format nil "~a~a ~a~a~a~{~%~a~}" 
@@ -225,12 +226,12 @@
 		 (push line transactions)))))
       (nreverse transactions)))
 
-(defun preprocess-ledger-file (fname)
-  (with-open-file (stream (cat fname ".gen")
-			  :direction :OUTPUT
-			  :if-exists :SUPERSEDE)
-    (mapcar (lambda (line)
-	      (format stream "~a~%~%" line))
-	    (parse-ledger-file (split-ledger-file fname)))))
+;(defun preprocess-ledger-file (fname)
+;  (with-open-file (stream (cat fname ".gen")
+;			  :direction :OUTPUT
+;			  :if-exists :SUPERSEDE)
+ ;   (mapcar (lambda (line)
+;	      (format stream "~a~%~%" line))
+;	    (parse-ledger-file (split-ledger-file fname)))))
 ;(preprocess-ledger-file *ledger-fname*)
 
