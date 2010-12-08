@@ -24,10 +24,7 @@
   (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.5 :units-before "$" :units-after ""))))
   (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.50 :units-before "$" :units-after ""))))
   (is (equal "$1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "$" :units-after ""))))
-
-  ;(is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
-  ;(is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
-  ;(is (equal "$350" (string-form (parse-amount "$350"))))
+  (is (equal "HKD 1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "HKD " :units-after ""))))
 )
 
 (test string-form-date
@@ -123,9 +120,9 @@
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl      ;note"))))
   (is (equal '("Liabilities:Due to/from Karl" ("$" 231.0 "") (nil)  nil nil "note") 
-	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $231.00;note"))))
+	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $231.00; note"))))
   (is (equal '("Liabilities:Due to/from Karl" ("$" 232.0 "") (nil) nil nil "note") 
-	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $232.00    ;note"))))
+	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $232.00    ;  note"))))
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    ;note"))))
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t nil "") (get-as-list (parse-transaction "    * Liabilities:Due to/from Karl      "))))
@@ -136,6 +133,11 @@
   (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "    Assets:Cash"))))
   (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "Assets:Cash"))))
   (is (equal '("Assets:Cash" (nil) (nil) t nil "") (get-as-list (parse-transaction "*Assets:Cash"))))
+  (is (equal '("Assets:Equines" ("" 10 "") ("$" 5000 "") t nil "") (get-as-list (parse-transaction "*Assets:Equines      10 @ $5000"))))
+  (is (equal '("Assets:Equines" ("" 10 " Horses") ("$" 5000 "") t nil "")
+	     (get-as-list (parse-transaction "*Assets:Equines      10 Horses @ $5000"))))
+  (is (equal '("Assets:Equines" ("" 10 " Horses") ("$" 5000 "") t nil "A monopoly on poloponies!")
+	     (get-as-list (parse-transaction "*Assets:Equines      10 Horses @@ $50000;  A monopoly on poloponies!"))))
   )
 
 (test parse-entry-line
@@ -144,69 +146,59 @@
 		   t t "code" nil)
 	     (get-as-list 
 	      (parse-entry-line "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."))))
-  (is (equal (list "2010-02-07" "2010-02-14" 
-		   "Description of transaction."
-		   t t "code" nil)
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction." t t "code" nil)
 	     (get-as-list 
 	      (parse-entry-line "2010/2/7=2010/2/14 *! (code) Description of transaction."))))
-
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 *! (code)Description of transaction.")))
-    (is (equal T (cleared p)))
-    (is (equal T (pending p)))
-    (is (equal "code" (code p)))
-    (is (equal "Description of transaction." (desc p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 *!(code)Description of transaction.")))
-    (is (equal T (cleared p)))
-    (is (equal T (pending p)))
-    (is (equal "code" (code p)))
-    (is (equal "Description of transaction." (desc p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 (code)Description of transaction.")))
-    (is (equal nil (cleared p)))
-    (is (equal nil (pending p)))
-    (is (equal "code" (code p)))
-    (is (equal "Description of transaction." (desc p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 *! Description of transaction (with parens). ")))
-    (is (equal T (cleared p)))
-    (is (equal T (pending p)))
-    (is (equal "2010-02-07" (string-form (date p))))
-    (is (equal "2010-02-14" (string-form (effective-date p))))
-    (is (equal nil (code p)))
-    (is (equal "Description of transaction (with parens). " (desc p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 (code) Description of transaction (with parens). ")))
-    (is (equal nil (cleared p)))
-    (is (equal nil (pending p)))
-    (is (equal "2010-02-07" (string-form (date p))))
-    (is (equal "2010-02-14" (string-form (effective-date p))))
-    (is (equal "code" (code p)))
-    (is (equal "Description of transaction (with parens). " (desc p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 * (code) Description of transaction (with parens). ")))
-    (is (equal "code" (code p)))
-    (is (equal T (cleared p)))
-    (is (equal nil (pending p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 ! (code) Description of transaction (with parens). ")))
-    (is (equal "code" (code p)))
-    (is (equal nil (cleared p)))
-    (is (equal T (pending p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 * Description of transaction (with parens). ")))
-    (is (equal nil (code p)))
-    (is (equal T (cleared p)))
-    (is (equal nil (pending p))))
-  (let ((p (parse-entry-line "2010/2/7=2010/2/14 ! Description of transaction (with parens). ")))
-    (is (equal nil (code p)))
-    (is (equal nil (cleared p)))
-    (is (equal T (pending p))))
-  (let ((p (parse-entry-line "2010/2/7 *! Description of transaction (with parens).")))
-    (is (equal T (cleared p)))
-    (is (equal T (pending p)))
-    (is (equal "2010-02-07" (string-form (date p))))
-    (is (equal nil (effective-date p)))
-    (is (equal nil (code p)))
-    (is (equal "Description of transaction (with parens)." (desc p))))
-  (let ((p (parse-entry-line "2/7 *! Description of transaction (with parens).")))
-    (is (equal "02-07" (string-form (date p))))
-    (is (equal nil (effective-date p))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction." t t "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 *! (code)Description of transaction."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction." t t "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 *!(code)Description of transaction."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction." nil nil "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 (code)Description of transaction."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." t t nil nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 *! Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." nil nil "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 (code) Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." t nil "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 * (code) Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." nil t "code" nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 ! (code) Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." nil t nil nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 ! Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" "2010-02-14" "Description of transaction (with parens)." t nil nil nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7=2010/2/14 * Description of transaction (with parens)."))))
+  (is (equal (list "2010-02-07" nil "Description of transaction (with parens)." t t nil nil)
+	     (get-as-list 
+	      (parse-entry-line "2010/2/7 *! Description of transaction (with parens)."))))
+  (is (equal (list "02-07" nil "Description of transaction (with parens)." t t nil nil)
+	     (get-as-list 
+	      (parse-entry-line "2/7 *! Description of transaction (with parens)."))))
   )
 
+(test parse-entry 
+   (is (equal "2010-02-07=2010-02-14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
+   Expenses:Bureaucracy     $-359
+   Liabilities:Due to/from Karl     $179.50
+   Liabilities:Due to/from James     $-179.-50
+   Assets:Cash     "
+	      (string-form (parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
+    Expenses:Bureaucracy                                 $-359.00
+    Liabilities:Due to/from Karl                         $179.50
+    Liabilities:Due to/from James                        $-179.50
+    Assets:Cash"))))
+   (is (equal "2010-02-07=2010-02-14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."
+	      (string-form 
+	       (parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion."))))
+  )
 
 (def-suite parse-amount :description "Test the parse-amount routines" :in parser)
 (in-suite parse-amount)
@@ -230,6 +222,7 @@
   (is (equal '("" 5 " goats") (get-as-list (first (multiple-value-list (parse-amount-complex "5 goats @ $300"))))))
   (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "5 goats @@ $300"))))))
   (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "    5 goats @@ $300    "))))))
+  (is (equal "$350" (string-form (parse-amount-complex "$350"))))
   )
 
 (defun test-all ()
