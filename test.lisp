@@ -12,12 +12,17 @@
 	     (get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       ;note"))))
   )
 
-(test string-form
+(def-suite string-form :description "Test the object class definitions" :in sassetti-test)
+(in-suite string-form)
+
+(test string-form-amount
   "Test string-form methods for various objects."
   (is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
   (is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
   (is (equal "$350" (string-form (parse-amount "$350"))))
+)
 
+(test string-form-date
   (is (equal "1975-11-12" (string-form (make-instance 'date :year 1975 :month 11 :day 12))))
   (is (equal "1977-10-01" (string-form (make-instance 'date :year 1977 :month 10 :day 1))))
   (is (equal "1977-04-13" (string-form (make-instance 'date :year 1977 :month 4 :day 13))))
