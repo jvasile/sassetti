@@ -123,9 +123,9 @@
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl      ;note"))))
   (is (equal '("Liabilities:Due to/from Karl" ("$" 231.0 "") (nil)  nil nil "note") 
-	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $231.00;note"))))
+	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $231.00; note"))))
   (is (equal '("Liabilities:Due to/from Karl" ("$" 232.0 "") (nil) nil nil "note") 
-	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $232.00    ;note"))))
+	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $232.00    ;  note"))))
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    ;note"))))
   (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t nil "") (get-as-list (parse-transaction "    * Liabilities:Due to/from Karl      "))))
@@ -136,6 +136,11 @@
   (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "    Assets:Cash"))))
   (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "Assets:Cash"))))
   (is (equal '("Assets:Cash" (nil) (nil) t nil "") (get-as-list (parse-transaction "*Assets:Cash"))))
+  (is (equal '("Assets:Equines" ("" 10 "") ("$" 5000 "") t nil "") (get-as-list (parse-transaction "*Assets:Equines      10 @ $5000"))))
+  (is (equal '("Assets:Equines" ("" 10 " Horses") ("$" 5000 "") t nil "")
+	     (get-as-list (parse-transaction "*Assets:Equines      10 Horses @ $5000"))))
+  (is (equal '("Assets:Equines" ("" 10 " Horses") ("$" 5000 "") t nil "A monopoly on poloponies!")
+	     (get-as-list (parse-transaction "*Assets:Equines      10 Horses @@ $50000;  A monopoly on poloponies!"))))
   )
 
 (test parse-entry-line

@@ -87,7 +87,8 @@
 		   :unit-price unit-price
 		   :cleared (not (equal (scan "\\*" (first parts)) nil))
 		   :pending (not (equal (scan "\\!" (first parts)) nil))
-		   :note (or (fifth parts) ""))))
+		   :note (trim-whitespace (fifth parts)))))
+
 (defun parse-entry-date (date)
   "Parse the date and any effective date.  Return two date objects,
   the second one is nil if there is no effective date."

@@ -58,8 +58,8 @@
 (defmethod units ((self amount))
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
 (defun dollar (amount)
-  "Print dollar amount, complete with commas and appropriate end-zero
-  padding (no dollar sign, though)."
+  "Print dollar amount, complete with commas and appropriate decimal
+  place and end-zero padding (no dollar sign, though)."
   (let* ((int (truncate (/ (round (* amount 100)) 100.0)))
 	 (decimal-places 2)
 	 (frac (round (* (expt 10 decimal-places) (- amount int) ))))
@@ -122,15 +122,13 @@
    ))
 
 (defmethod get-as-list ((self entry))
-  "TODO: handle transactions"
   (list (string-form (date self))
 	(if (effective-date self) (string-form (effective-date self)) nil)
 	(desc self)
 	(cleared self)
 	(pending self)
 	(code self)
-	(transactions self)))
-
+	(mapcar 'get-as-list (transactions self))))
 (defmethod string-form ((self entry))
   "TODO: handle transactions"
   (format nil "~a~a ~a~a~a~{~%~a~}" 
