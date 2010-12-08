@@ -38,6 +38,8 @@
   (list object))
 (defgeneric string-form (object)
   (:documentation "Return the object in ledger-format string form."))
+(defmethod string-form ((object NULL))
+  "")
 (defgeneric units (object)
   (:documentation "Returns the units string of an object, trimmed of whitespace."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,8 +57,17 @@
   "))
 (defmethod units ((self amount))
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
+(defun dollar (amount)
+  "Print dollar amount, complete with commas and appropriate end-zero
+  padding (no dollar sign, though)."
+  (let* ((int (truncate (/ (round (* amount 100)) 100.0)))
+	 (decimal-places 2)
+	 (frac (round (* (expt 10 decimal-places) (- amount int) ))))
+    (if (= frac 0)
+	(format nil "~:D" int)
+	(format nil "~:D.~V,'0D" int decimal-places frac))))
 (defmethod string-form ((self amount))
-  (cat (units-before self) (write-to-string (quantity self)) (units-after self)))
+  (format nil "~a~a~a" (units-before self) (dollar (quantity self)) (units-after self)))
 (defmethod get-as-list ((self amount))
   (list (units-before self) (quantity self) (units-after self)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,6 +93,12 @@
 	  (string-form (unit-price self))
 	  (cat (if (equal "" (note self)) "" ";") (note self))
 	  ))
+
+(string-form (parse-transaction "  *! Expenses:Bureaucracy:Add a space       $-359.00 ;note"))
+
+(get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       $-359.00 ;note"))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass date ()
   ((year :accessor year :initarg :year :initform nil)
@@ -114,15 +131,6 @@
 	(code self)
 	(transactions self)))
 
-;(defmethod string-form-transactions ((self entry))
-;  "Step through all the transactions in the transactions slot list and
-;  return their string-forms joined by newlines."
- ; "Transactions go here"
-;  (
-;  (string-form transaction
-;  (apply #'concatenate  at (list "1" "2"))
-;  (concatenate 'list 
-;  )
 (defmethod string-form ((self entry))
   "TODO: handle transactions"
   (format nil "~a~a ~a~a~a~{~%~a~}" 
@@ -138,7 +146,6 @@
 	  (if (code self) (format nil "(~a) " (code self)) "")
 	  (desc self)
 	  (mapcar 'string-format (transactions self))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass ledger ()
   ((fname :accessor fname :initarg :fname)

@@ -21,6 +21,9 @@
   "Test string-form methods for various objects."
   (is (equal "5 HKD" (string-form (make-instance 'amount :quantity 5 :units-before "" :units-after " HKD"))))
   (is (equal "$1" (string-form (make-instance 'amount :quantity 1 :units-before "$" :units-after ""))))
+  (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.5 :units-before "$" :units-after ""))))
+  (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.50 :units-before "$" :units-after ""))))
+  (is (equal "$1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "$" :units-after ""))))
 
   ;(is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
   ;(is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
@@ -35,6 +38,14 @@
   (is (equal "10-01" (string-form (make-instance 'date :year nil :month 10 :day 1))))
   (is (equal "04-13" (string-form (make-instance 'date :year nil :month 4 :day 13))))
   )
+
+(test string-form-transaction
+  (is (equal "   Expenses:Bureaucracy:Add a space     $-359.00 ;note"
+	     (string-form (parse-transaction "Expenses:Bureaucracy:Add a space       $-359.00 ;note"))
+	     (format nil "~%~a~%~a" "   Expenses:Bureaucracy:Add a space     $-359.00 ;note"
+		     (string-form (parse-transaction "Expenses:Bureaucracy:Add a space       $-359.00 ;note")))
+)
+)
 
 (def-suite classes :description "Test the object class definitions" :in sassetti-test)
 (in-suite classes)
@@ -201,11 +212,11 @@
 (in-suite parse-amount)
 
 (test parse-amount
-  (is (equal "$13219.23" (string-form (parse-amount "$13,219.23"))))
-  (is (equal "$1732" (string-form (parse-amount "$1,732 "))))
+  (is (equal "$13,219.23" (string-form (parse-amount "$13,219.23"))))
+  (is (equal "$1,732" (string-form (parse-amount "$1,732 "))))
   (is (equal "$1.12" (string-form (parse-amount "   $1.12  "))))
   (is (equal '("$" 1 "") (get-as-list (parse-amount "   $1  "))))
-  (is (equal '("HKD " 1 "") (get-as-list (parse-amount "   HKD 1  "))))
+  (is (equal '("HKD " 1512.99 "") (get-as-list (parse-amount "   HKD 1512.99  "))))
   (is (equal '("" 1 " HKD") (get-as-list (parse-amount "   1 HKD  "))))
 
   (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
