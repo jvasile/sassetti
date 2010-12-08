@@ -1,14 +1,16 @@
-(in-package :sassetti)
+(in-package #:sassetti)
 
 (def-suite sassetti-test :description "Test Suite for Sasetti")
 (in-suite sassetti-test)
 
 (test get-as-list 
-  (is (equal '(1 "$" NIL "") (get-as-list (parse-amount "$1")) ))
+  (is (equal (list nil) (get-as-list nil)))
+  (is (equal '("" 5 " HKD") (get-as-list (make-instance 'amount :quantity 5 :units-before "" :units-after " HKD"))))
+  (is (equal '("$" 1 "") (get-as-list (make-instance 'amount :quantity 1 :units-before "$" :units-after ""))))
   (is (equal '(1976 11 29) (get-as-list (parse-date "1976/11/29"))))
-  (is (equal '("Expenses:Bureaucracy:Add a space" (-359.0 "$" nil "") nil nil "note")
+  (is (equal '("Expenses:Bureaucracy:Add a space" ("$" -359.0 "") (nil) nil nil "note")
 	     (get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       $-359.00 ;note"))))
-  (is (equal '("Expenses:Bureaucracy:Add a space" nil nil nil "note")
+  (is (equal '("Expenses:Bureaucracy:Add a space" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       ;note"))))
   )
 
@@ -17,9 +19,12 @@
 
 (test string-form-amount
   "Test string-form methods for various objects."
-  (is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
-  (is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
-  (is (equal "$350" (string-form (parse-amount "$350"))))
+  (is (equal "5 HKD" (string-form (make-instance 'amount :quantity 5 :units-before "" :units-after " HKD"))))
+  (is (equal "$1" (string-form (make-instance 'amount :quantity 1 :units-before "$" :units-after ""))))
+
+  ;(is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
+  ;(is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
+  ;(is (equal "$350" (string-form (parse-amount "$350"))))
 )
 
 (test string-form-date
@@ -54,15 +59,14 @@
     (is (= 29 (day d)))))
 
 (test amount
-  (let ((amt (make-instance 'amount
-			    :price 50
-			    :denomination "$"
-			    :units 25
-			    :commodity "AAPL")))
-    (is (= 50 (price amt)))
-    (is (equal "$" (denomination amt)))
-    (is (= 25 (units amt)))
-    (is (equal "AAPL" (commodity amt)))))
+  (let ((amt (make-instance 'amount :quantity 50 :units-before "$" :units-after "")))
+    (is (= 50 (quantity amt)))
+    (is (equal "$" (units-before amt)))
+    (is (equal "" (units-after amt))))
+  (is (equal "HKD" (units (make-instance 'amount :quantity 5 :units-before "" :units-after " HKD"))))
+  (is (equal "$" (units (make-instance 'amount :quantity 15 :units-before "$" :units-after ""))))
+  (is (equal "Euro" (units (make-instance 'amount :quantity 25 :units-before "Euro " :units-after "")))))
+
 
 
 (def-suite parser :description "Test the ledger file parser" :in sassetti-test)
@@ -103,24 +107,24 @@
   )
 
 (test parse-transaction
-  (is (equal '("Liabilities:Due to/from Karl" nil nil nil "") (get-as-list (parse-transaction "    Liabilities:Due to/from Karl"))))
-  (is (equal '("Liabilities:Due to/from Karl" nil nil nil "") (get-as-list (parse-transaction "    Liabilities:Due to/from Karl      "))))
-  (is (equal '("Liabilities:Due to/from Karl" nil nil nil "note")
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "") (get-as-list (parse-transaction "    Liabilities:Due to/from Karl"))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "") (get-as-list (parse-transaction "    Liabilities:Due to/from Karl      "))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl      ;note"))))
-  (is (equal '("Liabilities:Due to/from Karl" (231.0 "$" nil "") nil nil "note") 
+  (is (equal '("Liabilities:Due to/from Karl" ("$" 231.0 "") (nil)  nil nil "note") 
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $231.00;note"))))
-  (is (equal '("Liabilities:Due to/from Karl" (232.0 "$" nil "") nil nil "note") 
+  (is (equal '("Liabilities:Due to/from Karl" ("$" 232.0 "") (nil) nil nil "note") 
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    $232.00    ;note"))))
-  (is (equal '("Liabilities:Due to/from Karl" nil nil nil "note")
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil nil "note")
 	     (get-as-list (parse-transaction "    Liabilities:Due to/from Karl    ;note"))))
-  (is (equal '("Liabilities:Due to/from Karl" nil t nil "") (get-as-list (parse-transaction "    * Liabilities:Due to/from Karl      "))))
-  (is (equal '("Liabilities:Due to/from Karl" nil nil t "") (get-as-list (parse-transaction "    ! Liabilities:Due to/from Karl      "))))
-  (is (equal '("Liabilities:Due to/from Karl" nil t t "") (get-as-list (parse-transaction "    *! Liabilities:Due to/from Karl      "))))
-  (is (equal '("Liabilities:Due to/from Karl" nil t t "") (get-as-list (parse-transaction "    !* Liabilities:Due to/from Karl      "))))
-  (is (equal '("Liabilities:Due to/from Karl" nil t t "") (get-as-list (parse-transaction "    *!Liabilities:Due to/from Karl      "))))
-  (is (equal '("Assets:Cash" nil nil nil "") (get-as-list (parse-transaction "    Assets:Cash"))))
-  (is (equal '("Assets:Cash" nil nil nil "") (get-as-list (parse-transaction "Assets:Cash"))))
-  (is (equal '("Assets:Cash" nil t nil "") (get-as-list (parse-transaction "*Assets:Cash"))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t nil "") (get-as-list (parse-transaction "    * Liabilities:Due to/from Karl      "))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) nil t "") (get-as-list (parse-transaction "    ! Liabilities:Due to/from Karl      "))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t t "") (get-as-list (parse-transaction "    *! Liabilities:Due to/from Karl      "))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t t "") (get-as-list (parse-transaction "    !* Liabilities:Due to/from Karl      "))))
+  (is (equal '("Liabilities:Due to/from Karl" (nil) (nil) t t "") (get-as-list (parse-transaction "    *!Liabilities:Due to/from Karl      "))))
+  (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "    Assets:Cash"))))
+  (is (equal '("Assets:Cash" (nil) (nil) nil nil "") (get-as-list (parse-transaction "Assets:Cash"))))
+  (is (equal '("Assets:Cash" (nil) (nil) t nil "") (get-as-list (parse-transaction "*Assets:Cash"))))
   )
 
 (test parse-entry-line
@@ -192,71 +196,26 @@
 
 (def-suite parse-amount :description "Test the parse-amount routines" :in parser)
 (in-suite parse-amount)
-(test parse-amount-currency
-  (is (equal '(50 "$") (multiple-value-list (parse-amount-currency "$50"))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "$13,502.91"))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "  $13,502.91"))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "$13,502.91  "))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "  $13,502.91  "))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "$ 13,502.91"))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "$         13,502.91"))))
-  (is (equal '(13502.91 "$") (multiple-value-list (parse-amount-currency "  $    13,502.91    "))))
-
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "13,502.91"))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "  13,502.91"))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "13,502.91  "))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "  13,502.91  "))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency " 13,502.91"))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "         13,502.91"))))
-  (is (equal '(13502.91 "") (multiple-value-list (parse-amount-currency "      13,502.91    "))))
-
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "  13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "13,502.91  HKD  "))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "  13,502.91  HKD  "))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency " 13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "         13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD") (multiple-value-list (parse-amount-currency "      13,502.91    HKD"))))
-
-  (is (equal '(0 "$") (multiple-value-list (parse-amount-currency "$"))))
-  )
 
 (test parse-amount
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "$13,502.91"))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "  $13,502.91"))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "$13,502.91  "))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "  $13,502.91  "))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "$ 13,502.91"))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "$         13,502.91"))))
-  (is (equal '(13502.91 "$" NIL "") (get-as-list (parse-amount "  $    13,502.91    "))))
+  (is (equal "$13219.23" (string-form (parse-amount "$13,219.23"))))
+  (is (equal "$1732" (string-form (parse-amount "$1,732 "))))
+  (is (equal "$1.12" (string-form (parse-amount "   $1.12  "))))
+  (is (equal '("$" 1 "") (get-as-list (parse-amount "   $1  "))))
+  (is (equal '("HKD " 1 "") (get-as-list (parse-amount "   HKD 1  "))))
+  (is (equal '("" 1 " HKD") (get-as-list (parse-amount "   1 HKD  "))))
 
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "13,502.91"))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "  13,502.91"))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "13,502.91  "))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "  13,502.91  "))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount " 13,502.91"))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "         13,502.91"))))
-  (is (equal '(13502.91 "" NIL "") (get-as-list (parse-amount "      13,502.91    "))))
+  (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
+  (is (equal '("" 1 "") (get-as-list (parse-amount "1")))))
 
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "  13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "13,502.91  HKD  "))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "  13,502.91  HKD  "))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount " 13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "         13,502.91 HKD"))))
-  (is (equal '(13502.91 "HKD" NIL "") (get-as-list (parse-amount "      13,502.91    HKD"))))
-
-  (is (equal '(0 "$" NIL "") (get-as-list (parse-amount "$"))))
-
-  (is (equal '(30.0 "$" 50 "AAPL") (get-as-list (parse-amount "50 AAPL @ $30.00"))))
-  (is (equal '(30.0 "$" 50.5 "AAPL") (get-as-list (parse-amount "50.5    AAPL    @ $30.00"))))
-  (is (equal '(30.0 "$" 50 "AAPL") (get-as-list (parse-amount "50 AAPL @@ $1500.00"))))
-  (is (equal '( 30.0 "$" 50 "AAPL")
-	     (get-as-list (parse-amount "  50    AAPL    @@ $1500.00  "))))
-
-  (is (equal '(30.0 "$" 50 "AAPL") (get-as-list (parse-amount "50 AAPL @ $30.00  x"))))
-  (is (equal '(30.0 "$" 50 "AAPL") (get-as-list (parse-amount "50 AAPL @ $30.00  ."))))
-  (is (equal '(135.2 "$" NIL "") (get-as-list (parse-amount "$135.20  ."))))
+(test parse-amount-complex
+  (is (equal '("$" 1 "") (get-as-list (first (multiple-value-list (parse-amount-complex "$1"))))))
+  (is (eq nil (second (multiple-value-list (parse-amount-complex "$1")))))
+  (is (equal '("" 5 " goats") (get-as-list (first (multiple-value-list (parse-amount-complex "5 goats @ $30"))))))
+  (is (equal '("$" 30 "") (get-as-list (second (multiple-value-list (parse-amount-complex "5 goats @ $30"))))))
+  (is (equal '("" 5 " goats") (get-as-list (first (multiple-value-list (parse-amount-complex "5 goats @ $300"))))))
+  (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "5 goats @@ $300"))))))
+  (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "    5 goats @@ $300    "))))))
   )
 
 (defun test-all ()
