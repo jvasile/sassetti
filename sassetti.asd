@@ -9,6 +9,7 @@
   :components ((:file "package")
                (:file "sassetti")
 	       (:file "test")
+	       (:file "parse")
 	       )
   :long-description "Sassetti is a Common Lisp reimplementation of
 John Wiegley's commandline ledger program.  The goal is to harness the
