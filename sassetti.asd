@@ -7,6 +7,7 @@
   :author "James Vasile <james@hackervisions.org>"
   :licence "Copyright 2008 James Vasile, Relesaed under GNU General Public License, Version 3 or later"
   :components ((:file "package")
+	       (:file "util")
                (:file "sassetti")
 	       (:file "test")
 	       (:file "parse")

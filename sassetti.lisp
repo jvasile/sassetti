@@ -27,15 +27,6 @@
 (in-package #:sassetti)
 
 (defvar *ledger-fname* "main.ledger.lisp" "Ledger file name")
-(unless (symbolp 'newline)
-  (defconstant newline (string #\Newline) "Newline char in string form"))
-
-(defmacro cat (&rest strings) 
-  "Concatenate string"
-  `(concatenate 'string ,@strings))
-(defmacro trim-whitespace (s)
-  "Trim leading and trailing whitespace"
-  `(string-trim '(#\Space #\Tab #\Newline) ,s))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgeneric get-as-list (object)
