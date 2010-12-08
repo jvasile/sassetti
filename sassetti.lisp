@@ -14,6 +14,8 @@
 ;;;; Set *ledger-fname* to the path of your ledger file
 ;;;; Eval this (position point after s-expression, then C-x C-e): (preprocess-ledger-file *ledger-fname*)
 ;;;; Now run ledger on the resulting ledger file.
+;;;;
+;;;; Don't forget you can compile forms with C-c C-c
 
 (in-package #:sassetti)
 
@@ -98,12 +100,26 @@
 			 :denomination denomination)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass transaction ()
-  ((account :accessor account :initarg :account)
-   (amount :accessor amount :initarg :amount)
-   (cleared :accessor cleared :initarg :cleared)
-   (pending :accessor pending :initarg :pending)
-   (note :accessor note :initarg :note)
+  ((account :accessor account :initarg :account :initform "")
+   (amount :accessor amount :initarg :amount )
+   (cleared :accessor cleared :initarg :cleared :initform nil)
+   (pending :accessor pending :initarg :pending :initform nil)
+   (note :accessor note :initarg :note :initform "")
    ))
+(defmethod get-as-list ((self transaction))
+  (list (account self) (if (amount self) (get-as-list (amount self)) nil) (cleared self) (pending self) (note self)))
+(defmethod string-form ((self transaction))
+  (format nil "   ~a~a     ~a~a"
+	  (if (or (cleared self) (pending self))
+	      (format nil "~a~a " 
+		      (if (cleared self) "*" "")
+		      (if (pending self) "!" ""))
+	      "")
+	  (account self)
+	  (string-form (amount self))
+	  (cat (if (equal "" (note self)) "" ";") (note self))
+	  ))
+
 (defun parse-transaction (line)
   "Parse a transaction (e.g. one indented line from an entry).
   Returns a transaction object.
@@ -120,6 +136,9 @@
   actual and/or effective date for the transaction by using the syntax
   '[ACTUAL_DATE]' or '[=EFFECTIVE_DATE]' or
   '[ACTUAL_DATE=EFFECtIVE_DATE]'.
+
+  TODO: handle dates in the note section
+  TODO: do we need to trim leading space from the note?
   "
   (let ((parts (coerce (second (multiple-value-list (scan-to-strings "^\\s*([*!]*)\\s*(.*?)(\\s\\s+([^;]*);?(.*?))?$"
 								     line))) 'list)))
@@ -133,10 +152,6 @@
 		   :cleared (not (equal (scan "\\*" (first parts)) nil))
 		   :pending (not (equal (scan "\\!" (first parts)) nil))
 		   :note (or (fifth parts) ""))))
-
-(defmethod get-as-list ((self transaction))
-  (list (account self) (if (amount self) (get-as-list (amount self)) nil) (cleared self) (pending self) (note self)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass date ()
   ((year :accessor year :initarg :year :initform nil)
@@ -164,13 +179,13 @@
 	   (coerce (second (multiple-value-list (scan-to-strings "(\\d+)?\\D?\\b(\\d+)\\D(\\d+)\\s*$" date))) 'list))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass entry ()
-  ((date :accessor date :initarg :date)
-   (effective-date :accessor effective-date :initarg :effective-date)
-   (desc :accessor desc :initarg :desc)
-   (cleared :accessor cleared :initarg :cleared)
-   (pending :accessor pending :initarg :pending)
-   (code :accessor code :initarg :code)
-   (transactions :accessor transactions :initform nil)
+  ((date :accessor date :initarg :date :initform nil)
+   (effective-date :accessor effective-date :initarg :effective-date :initform nil)
+   (desc :accessor desc :initarg :desc :initform "")
+   (cleared :accessor cleared :initarg :cleared :initform nil)
+   (pending :accessor pending :initarg :pending :initform nil)
+   (code :accessor code :initarg :code :initform nil)
+   (transactions :accessor transactions :initarg transactions :initform (list ))
    ))
 
 (defmethod get-as-list ((self entry))
@@ -182,6 +197,30 @@
 	(pending self)
 	(code self)
 	(transactions self)))
+(defmethod string-form-transactions ((self entry))
+  "Step through all the transactions in the transactions slot list and
+  return their string-forms joined by newlines."
+  "Transactions go here"
+  (
+  (string-form transaction
+  (apply #'concatenate  at (list "1" "2"))
+  (concatenate 'list 
+  )
+(defmethod string-form ((self entry))
+  "TODO: handle transactions"
+  (format nil "~a~a ~a~a~a~{~%~a~}" 
+	  (string-form (date self)) 
+	  (if (effective-date self)
+	      (cat "=" (string-form (effective-date self)))
+	      "")
+	  (if (or (cleared self) (pending self))
+	      (format nil "~a~a " 
+		      (if (cleared self) "*" "")
+		      (if (pending self) "!" ""))
+	      "")
+	  (if (code self) (format nil "(~a) " (code self)) "")
+	  (desc self)
+	  (mapcar 'string-format (transactions self))))
 
 (defun parse-entry-date (date)
   "Parse the date and any effective date.  Return two date objects,
