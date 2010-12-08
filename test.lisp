@@ -24,10 +24,7 @@
   (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.5 :units-before "$" :units-after ""))))
   (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.50 :units-before "$" :units-after ""))))
   (is (equal "$1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "$" :units-after ""))))
-
-  ;(is (equal "50 AAPL @ $25" (string-form (parse-amount "50 AAPL @ $25"))))
-  ;(is (equal "150 AAPL @ $2" (string-form (parse-amount "150 AAPL @@ $300"))))
-  ;(is (equal "$350" (string-form (parse-amount "$350"))))
+  (is (equal "HKD 1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "HKD " :units-after ""))))
 )
 
 (test string-form-date
@@ -209,6 +206,7 @@
   (is (equal '("" 5 " goats") (get-as-list (first (multiple-value-list (parse-amount-complex "5 goats @ $300"))))))
   (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "5 goats @@ $300"))))))
   (is (equal '("$" 60 "") (get-as-list (second (multiple-value-list (parse-amount-complex "    5 goats @@ $300    "))))))
+  (is (equal "$350" (string-form (parse-amount-complex "$350"))))
   )
 
 (defun test-all ()
