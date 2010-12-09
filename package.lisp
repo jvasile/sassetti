@@ -1,5 +1,6 @@
 ;;;; package.lisp
 
+(load "tilde.lisp")
 (ql:quickload 'cl-ppcre)
 (ql:quickload 'iterate)
 (ql:quickload 'split-sequence)
@@ -11,4 +12,7 @@
 	:iterate 
 	:it.bese.FiveAM
 	))
+
+(in-package #:sassetti)
+
 
