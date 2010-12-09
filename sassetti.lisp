@@ -56,24 +56,8 @@
   "))
 (defmethod units ((self amount))
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
-(defun dollar-old (amount)
-  "Print dollar amount, complete with commas and appropriate decimal
-  place and end-zero padding (no dollar sign, though)."
-  (let* ((int (truncate (/ (round (* amount 100)) 100.0)))
-	 (decimal-places 2)
-	 (frac (abs (round (* (expt 10 decimal-places) (- amount int) )))))
-    (if (= frac 0)
-	(format nil "~:D" int)
-	(format nil "~:D.~V,'0D" int decimal-places frac))))
-(defun dollar (amount)
-  "Print dollar amount, complete with commas and appropriate decimal
-  place and end-zero padding (no dollar sign, though)."
-  (if (= (truncate amount) amount)
-      (format nil "~a" (truncate (/ (round (* amount 100)) 100.0)))
-      (format nil "~,2f" (round-cent amount))
-      ))
-(defmethod string-form ((self amount) &key w)
-  (format nil "~a~a~a" (units-before self) (dollar (quantity self)) (units-after self)))
+(defmethod string-form ((self amount) &key commas-p)
+  (dollars (quantity self) :comma-char commas-p :pre-units (units-before self) :post-units (units-after self)))
 (defmethod get-as-list ((self amount))
   (list (units-before self) (quantity self) (units-after self)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
