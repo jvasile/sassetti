@@ -19,3 +19,5 @@ John Wiegley's commandline ledger program.  The goal is to harness the
 power of Wiegley's simple tools and extend them with the flexibility
 of lisp."  )
 
+(load "package.lisp")
+
