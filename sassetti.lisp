@@ -62,10 +62,11 @@
   place and end-zero padding (no dollar sign, though)."
   (let* ((int (truncate (/ (round (* amount 100)) 100.0)))
 	 (decimal-places 2)
-	 (frac (round (* (expt 10 decimal-places) (- amount int) ))))
+	 (frac (abs (round (* (expt 10 decimal-places) (- amount int) )))))
     (if (= frac 0)
 	(format nil "~:D" int)
 	(format nil "~:D.~V,'0D" int decimal-places frac))))
+
 (defmethod string-form ((self amount))
   (format nil "~a~a~a" (units-before self) (dollar (quantity self)) (units-after self)))
 (defmethod get-as-list ((self amount))

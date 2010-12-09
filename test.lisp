@@ -29,7 +29,8 @@
   (is (equal "$1.50" (string-form (make-instance 'amount :quantity 1.50 :units-before "$" :units-after ""))))
   (is (equal "$1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "$" :units-after ""))))
   (is (equal "HKD 1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "HKD " :units-after ""))))
-)
+  (is (equal "$-117.50" (string-form (parse-amount "$-117.50"))))
+  (is (equal "$-117" (string-form (parse-amount "$-117")))))
 
 (test string-form-date
   (is (equal "1975-11-12" (string-form (make-instance 'date :year 1975 :month 11 :day 12))))
@@ -192,7 +193,7 @@
    (is (equal "2010-02-07=2010-02-14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
    Expenses:Bureaucracy     $-359
    Liabilities:Due to/from Karl     $179.50
-   Liabilities:Due to/from James     $-179.-50
+   Liabilities:Due to/from James     $-179.50
    Assets:Cash     "
 	      (string-form (parse-entry "2010/2/7=2010/2/14 *! (code) Description of transaction (with parens) and * and ! and 1976/11/29 for confusion.
     Expenses:Bureaucracy                                 $-359.00
@@ -216,7 +217,10 @@
   (is (equal '("" 1 " HKD") (get-as-list (parse-amount "   1 HKD  "))))
 
   (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
-  (is (equal '("" 1 "") (get-as-list (parse-amount "1")))))
+  (is (equal '("" 1 "") (get-as-list (parse-amount "1"))))
+
+  (is (equal '("$" -117.5 "") (get-as-list (parse-amount "$-117.50"))))
+  )
 
 (test parse-amount-complex
   (is (equal '("$" 1 "") (get-as-list (first (multiple-value-list (parse-amount-complex "$1"))))))
