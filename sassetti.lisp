@@ -58,7 +58,7 @@
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
 (defmethod string-form ((self amount) &key (commas-p nil))
   (dollars (quantity self) 
-	   :comma-char (if commas-p #\, nil))
+	   :comma-char (if commas-p #\, nil)
 	   :pre-units (units-before self) :post-units (units-after self)))
 (defmethod get-as-list ((self amount))
   (list (units-before self) (quantity self) (units-after self)))
