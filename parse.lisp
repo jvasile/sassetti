@@ -33,9 +33,11 @@
       (make-instance 'amount 
 		     :quantity (if (equal price ".") 
 				   0
-				   (read-from-string (remove #\, price)))
+				   ;(read-from-string (remove #\, price)))
+				   (rational-from-float-string (trim-whitespace (remove #\, price))))
 		     :units-before (regex-replace "^\\s*" units-before "")
 		     :units-after (regex-replace "\\s*$" units-after "")))))
+
 (defun parse-amount-complex (s)
   "Accept a string like '$3502' or '-23 Euros' or '22 Martian Dollars'
   or 'HKD 253.21'.  Returns an amount object with the quantity,
