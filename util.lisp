@@ -20,9 +20,9 @@
   rational (e.g. 123112/2551)"
   (let ((dp (position #\. fstring :test #'equal)))
     (if dp
-	(let ((int (subseq fstring 0 dp))
-	      (frac (subseq fstring (+ 1 dp))))
-	  (+ (parse-integer int) (/ (parse-integer frac) (expt 10 (length frac)))))
+	(let* ((int (parse-integer (subseq fstring 0 dp)))
+	       (frac (subseq fstring (+ 1 dp))))
+	  (* (+ (abs int) (/ (parse-integer frac) (expt 10 (length frac)))) (/ int (abs int))))
 	(parse-integer fstring))))
 
 (defun dollars (amount  
