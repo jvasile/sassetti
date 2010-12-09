@@ -250,7 +250,7 @@
   (is (equal "$1732" (string-form (parse-amount "$1,732 "))))
   (is (equal "$1.12" (string-form (parse-amount "   $1.12  "))))
   (is (equal '("$" 1 "") (get-as-list (parse-amount "   $1  "))))
-  (is (equal '("HKD " 15120099/10000 "") (get-as-list (parse-amount "   HKD 1512.99  "))))
+  (is (equal '("HKD " 151299/100 "") (get-as-list (parse-amount "   HKD 1512.99  "))))
   (is (equal '("" 1 " HKD") (get-as-list (parse-amount "   1 HKD  "))))
 
   (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
