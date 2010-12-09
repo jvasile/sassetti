@@ -8,7 +8,7 @@
 ;; Functions called from the ledger file
 (defun round-cent (f)
   "Round to the nearest hundreth"
-  (/ (round (* f 100)) 100.0))
+  (/ (round f 0.01) 100))
 
 (defun depreciate-recurse (year month category amount term-left)
   "Do the recursive portion of monthly depreciation"
