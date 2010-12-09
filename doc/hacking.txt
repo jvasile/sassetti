@@ -8,3 +8,15 @@ by appropriate tests.
 If you are interested in helping out, writing tests is a great place
 to start-- you don't need to know much about the code or lisp to write
 useful tests.
+
+## Before Submitting or Pushing
+
+There are a easy ways to test code before inflicting it on others.
+
+First, run all the unit tests with `(test-all).  If any of them fail,
+it should mean your changes broke something, as my goal is to always
+keep master in a state where all tests get passed.
+
+Second, close your lisp session and reload Sassetti in a fresh
+environment.  That will help ensure that your code's functionality
+doesn't depend on quirks of your lisp session.
