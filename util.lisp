@@ -11,4 +11,6 @@
   `(concatenate 'string ,@strings))
 (defmacro trim-whitespace (s)
   "Trim leading and trailing whitespace"
-  `(string-trim '(#\Space #\Tab #\Newline) ,s))
+  `(if ,s
+       (string-trim '(#\Space #\Tab #\Newline) ,s)
+       ""))
