@@ -14,6 +14,7 @@
 		 (read-from-string d)
 		 nil))
 	   (coerce (second (multiple-value-list (scan-to-strings "(\\d+)?\\D?\\b(\\d+)\\D(\\d+)\\s*$" date))) 'list))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun parse-amount (s)
   "Parse a portion of the amount that is a number and a symbol.
   Return an amount object with the number and symbol extracted
@@ -51,7 +52,7 @@
 	  )
 	(setf units (parse-amount s)))
     (values units unit-price)))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun parse-transaction (line)
   "Parse a transaction (e.g. one indented line from an entry).
   Returns a transaction object.
@@ -88,7 +89,7 @@
 		   :cleared (not (equal (scan "\\*" (first parts)) nil))
 		   :pending (not (equal (scan "\\!" (first parts)) nil))
 		   :note (trim-whitespace (fifth parts)))))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun parse-entry-date (date)
   "Parse the date and any effective date.  Return two date objects,
   the second one is nil if there is no effective date."
@@ -135,14 +136,47 @@
     (setf (transactions entry) (mapcar (lambda (line) (parse-transaction line)) lines))
     entry
     ))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun parse-ledger-chunk (chunk)
+  "Parse a chunk of the ledger file.  Chunks start with unindented
+  lines.  All other lines are indented."
+  (if (scan "^\\d" chunk)
+      (parse-entry chunk)
+      (if (scan "^\\(" chunk)
+	  (read-from-string (cat "#." chunk))
+	  chunk)))
+(defun split-ledger-file (fname)
+  "Returns a list of file FNAME split into chunks by cleaving on
+  unindented lines."
+  (let ((transactions (list ""))
+	(leading-whitespace "^[^\\w\\(\\)]"))
+    (with-open-file (stream fname)
+      (loop for line = (read-line stream nil)
+	 while line
+	 do
+	   (unless (or (scan (cat leading-whitespace "*;") line)
+		       (scan (cat leading-whitespace "*$") line))
+	     (if (scan leading-whitespace line)
+		 (setf (car transactions) (format nil "~a~%~a" (car transactions) line))
+		 (push line transactions)))))
+      (nreverse transactions)))
+(defun parse-ledger-file (fname)
+  "Step through the ledger file and convert each chunk into a lisp entry or function call.
+  For chunks we don't yet know how to convert, just store them as text.
+  Returns a ledger object."
+  (make-instance 'ledger 
+		 :fname fname
+		 :entries (mapcar 'parse-ledger-chunk (split-ledger-file (tilde:expand-tilde-namestring fname)))))
 
-(defun parse-ledger-file (file-lines)
-  "Take a list of lines from a ledger file and return them without
-  blank lines, without comment lines and with lisp expressions
-  evaluated."
-  (mapcar (lambda (x)
-	    (if (scan "^\\W*\\(" x)
-		(read-from-string (cat "#." x))
-		x));(parse-entry x)))
-	  file-lines))
+;(defun parse-ledger-file (file-lines)
+;  "Take a list of lines from a ledger file and return them without
+;  blank lines, without comment lines and with lisp expressions
+;  evaluated."
+;  (mapcar (lambda (x)
+;	    (if (scan "^\\W*\\(" x)
+;		(read-from-string (cat "#." x))
+;		x));(parse-entry x)))
+;	  file-lines))
+
+
 
