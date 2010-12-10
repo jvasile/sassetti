@@ -26,3 +26,7 @@ Sassetti should never crash and dump the user to the debugger.
 Unfortunately, I haven't put in any error handling yet, so crashes
 will result from malformed input.  That will change.
 
+## Todo
+
+* parse.lisp:  TODO: handle dates in the note section
+* parse.lisp:  TODO: do we need to trim leading space from the note?
