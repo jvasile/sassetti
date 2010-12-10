@@ -1,5 +1,7 @@
-PANDOC=`which pandoc`
-PDFLATEX=`which pdflatex`
+DOCDIR=../dist/doc
+
+PANDOC=pandoc
+PDFLATEX=pdflatex
 
 # List text files in the order in which you want them to appear in the
 # complete manual:
@@ -8,12 +10,22 @@ SOURCES=README.txt INSTALL.txt hacking.txt COPYING.txt colophon.txt
 HTML=sassetti.html $(patsubst %.txt,%.html,$(SOURCES))
 LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(SOURCES))
 PDF=sassetti.pdf $(patsubst %.txt,%.pdf,$(SOURCES))
+MAN=sassetti.1
+OUTPUTS=$(PDF) $(LATEX) $(HTML) $(MAN)
 
-all: pdf html
 
+all: $(OUTPUTS)
+
+dist: all
+	@mkdir -p $(DOCDIR)
+	cp $(OUTPUTS) $(DOCDIR)
 ###############################################################################
-$(SOURCES): 
+$(SOURCES):
 	ln -s ../`echo $@ | sed -e 's/.txt$$//'` $@
+###############################################################################
+$(MAN): Makefile
+	$(PANDOC) -s -t man -o $@ $(SOURCES)
+manpages: $(MAN)
 ###############################################################################
 %.tex: %.txt Makefile
 	$(PANDOC) -s --toc -f markdown --standalone -o $@ $<
@@ -42,5 +54,5 @@ clean-latex:
 	rm -rf *.log *.out *.aux *.toc
 
 clean: clean-latex
-	rm -rf $(PDF) $(LATEX) $(HTML)
+	rm -rf $(OUTPUTS)
 	rm -rf README.txt INSTALL.txt COPYING.txt
