@@ -11,7 +11,10 @@
 
 (defun depreciate-recurse (year month category amount term-left)
   "Do the recursive portion of monthly depreciation"
-  (cat (format nil "~a/~a/15 Depreciate ~a~%   Assets:Prepaid:~a            $-~f~%   Expenses:Depreciation:~a     $~f~%~%" 
+  (cat (format nil 
+	       (cat "~a/~a/15 Depreciate ~a~%"
+		    "   Assets:Prepaid:~a            $-~f~%"
+		    "   Expenses:Depreciation:~a     $~f~%~%" )
 	       year month category
 	       category amount
 	       category amount)
@@ -22,19 +25,38 @@
 			     amount 
 			     (- term-left 1)))))
 
+(defun depreciate-recurse (year month category amount term-left)
+  "Do the recursive portion of monthly depreciation"
+  (if (eq term-left 0)
+      (list)
+      (cons (parse-entry (format nil 
+				 (cat "~a/~a/15 Depreciate ~a~%"
+				      "   Assets:Prepaid:~a            $-~f~%"
+				      "   Expenses:Depreciation:~a     $~f" )
+				 year month category
+				 category amount
+				 category amount))
+	    (depreciate-recurse (+ year (floor (/ month 12.0))) 
+				(+ (mod month 12) 1) 
+				category 
+				amount 
+				(- term-left 1)))))
+
 (defun depreciate (year month category total term)
   "Monthly depreciation"
   (let* ((amount (round-cent (/ total (float term))))
 	(rounding-error (round-cent (- total (* amount term)))))
-    (cat (depreciate-recurse year month category amount term)
-	 (if (= 0 rounding-error)
-	     ""
-	     (unless (equal rounding-error 0.0)
-	       (format nil "~%~a/~a/15 Depreciation Rounding Fix~%   Assets:Prepaid:~a            $~f~%   Expenses:Depreciation:~a     $~f"
-		       (round (/ (+ (* year 12) term) 12.0))   (+ (mod (+ month (- term 1)) 12) 1)
-		       category (* -1 rounding-error)
-		       category rounding-error
-		       ))))))
+    (if (= 0 rounding-error)
+        (depreciate-recurse year month category amount term)
+	(cons (parse-entry (format nil 
+				    (cat "~d/~d/15 Depreciation Rounding Fix~%"
+					 "   Assets:Prepaid:~a            $~f~%"
+					 "   Expenses:Depreciation:~a     $~f"
+					 )
+				    (round (/ (+ (* year 12) term) 12.0)) (+ (mod (+ month (- term 1)) 12) 1)
+				    category (* -1 rounding-error)
+				    category rounding-error))
+	      (depreciate-recurse year month category amount term)))))
 
 (defun unbillable (date description category amount)
   "Charge off unbillable work"
@@ -47,7 +69,7 @@
   (parse-entry (format nil 
 		       "~a~%   Income:~a   $-~a~%   Assets:Checking:James    $~a~%   Assets:Checking:Karl    $~a"
 		       datedescrip category amount (/ amount 2) (/ amount 2))))
-;(preprocess-ledger-file *ledger-fname*)
+
 (defun shared-expense (datedescrip category amount &key (cleared-p nil) (pending-p nil) (code ""))
   "Expenses shared equally among the partners, paid from the checking account"
   (parse-entry (format nil 
