@@ -8,8 +8,37 @@ Wiegley's simple tools and extend them with the flexibility of lisp.
 
 Sassetti is designed to read Ledger files and do with them exactly
 what ledger would, except for a few minor variations.  First, Sassetti
-is in some places more forgiving than Ledger about spacing.  Second,
-and more importantly, Sassetti allows you to include lisp commands
-among your standard Ledger entries.  These get evaluated by Sassetti,
-perhaps generating new entries or changing how data is interpreted.
+is in some places more forgiving than Ledger about whitespace and
+such.  Second and more importantly, Sassetti allows you to include
+lisp commands among your standard Ledger entries.  These get evaluated
+by Sassetti, perhaps generating new entries or changing how data is
+interpreted.
 
+Access to Lisp enables you to write entries that are calculated or to
+generate multiple entries with a single line of code.  For example,
+using the built-in function `depreciate`, we can schedule depreciation
+for an asset over a length of time.  This will depreciate your gym
+membership over three months:
+
+`(depreciate 2010 03 "3 month gym membership" $225 3)
+
+That one line generates three entries and schedules them
+appropriately:
+
+`2010/3/15 Depreciate 3 month gym membership
+   Assets:Prepaid:3 month gym membership            $-75
+   Expenses:Depreciation:3 month gym membership     $75
+
+2010/4/15 Depreciate 3 month gym membership
+   Assets:Prepaid:3 month gym membership            $-75
+   Expenses:Depreciation:3 month gym membership     $75
+
+2010/5/15 Depreciate 3 month gym membership
+   Assets:Prepaid:3 month gym membership            $-75
+   Expenses:Depreciation:3 month gym membership     $75`
+
+Sassetti integrates into your workflow in two ways.  It can parse your
+ledger file and perform many of the same functions as Ledger itself.
+Alternatively, Sassetti can generate a new ledger file, which you can
+feed to Ledger (with Ledger's `-f` commandline parameter) or do
+whatever you normally do with those files.
