@@ -18,6 +18,8 @@
   (is (= -11651/100 (rational-from-float-string "-116.51")))
   (is (= 11749/100 (rational-from-float-string "117.49")))
   (is (= 11651/100 (rational-from-float-string "116.51")))
+  (is (= 1/25 (dollars "0.04")))
+  (is (= -1/25 (dollars "-0.04")))
   )
 (test dollars
   (is (equal "123,112" (dollars 123112.00)))

@@ -22,7 +22,7 @@
     (if dp
 	(let* ((int (parse-integer (subseq fstring 0 dp)))
 	       (frac (subseq fstring (+ 1 dp))))
-	  (* (+ (abs int) (/ (parse-integer frac) (expt 10 (length frac)))) (/ int (abs int))))
+	  (* (+ (abs int) (/ (parse-integer frac) (expt 10 (length frac)))) (if (equal (aref fstring 0) #\-) -1 1)))
 	(parse-integer fstring))))
 
 (defun dollars (amount  
@@ -62,3 +62,4 @@
 	    (if sign sign "")
 	    digits
 	    post-units)))
+
