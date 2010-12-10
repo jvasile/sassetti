@@ -1,49 +1,10 @@
+;;;; FiveAM testing for Sassetti
+;;;;
+;;;; See COPYING for copyright and licensing information.
 (in-package #:sassetti)
 
-(def-suite sassetti-test :description "Test Suite for Sasetti")
-(in-suite sassetti-test)
-
-(def-suite utils :description "Test Suite for Sasetti" :in sassetti-test)
-(in-suite utils)
-(test rational-from-float-string
-  (is (= 2134561/10 (rational-from-float-string "213456.10")))
-  (is (= 213456 (rational-from-float-string "213456.0")))
-  (is (= 213456 (rational-from-float-string "213456.00")))
-  (is (= 21345601/100 (rational-from-float-string "213456.01")))
-  (is (= 21345699/100 (rational-from-float-string "213456.99")))
-  (is (= 10672800695763/50000000 (rational-from-float-string "213456.01391526")))
-  (is (= 21345699165119217619219821/100000000000000000000 (rational-from-float-string "213456.99165119217619219821")))
-  (is (= -235/2 (rational-from-float-string "-117.50")))
-  (is (= -11749/100 (rational-from-float-string "-117.49")))
-  (is (= -11651/100 (rational-from-float-string "-116.51")))
-  (is (= 11749/100 (rational-from-float-string "117.49")))
-  (is (= 11651/100 (rational-from-float-string "116.51")))
-  (is (= 1/25 (dollars "0.04")))
-  (is (= -1/25 (dollars "-0.04")))
-  )
-(test dollars
-  (is (equal "123,112" (dollars 123112.00)))
-  (is (equal "123,112.10" (dollars 123112.10)))
-  (is (equal "123,112.10" (dollars 123112.1)))
-  (is (equal "123,112.01" (dollars 123112.01)))
-  (is (equal "123,112.99" (dollars 123112.99)))
-  (is (equal "123112" (dollars 123112.00 :comma-char nil)))
-  (is (equal "123112.10" (dollars 123112.10 :comma-char nil)))
-  (is (equal "123112.10" (dollars 123112.1 :comma-char nil)))
-  (is (equal "123112.01" (dollars 123112.01 :comma-char nil)))
-  (is (equal "123112.99" (dollars 123112.99 :comma-char nil)))
-  (is (equal "+123112.33" (dollars 123112.33 :comma-char nil :sign-p t)))
-  (is (equal "-123112.10" (dollars -123112.10 :comma-char nil :sign-p t)))
-  (is (equal "$-123112.10" (dollars -123112.10 :comma-char nil :pre-units "$")))
-  (is (equal "35 AAPL" (dollars 35 :post-units " AAPL")))
-  (is (equal "213,456.10" (dollars "213456.10")))
-  (is (equal "213,456" (dollars "213456.0")))
-  (is (equal "213,456" (dollars "213456.00")))
-  (is (equal "213,456.01" (dollars "213456.01")))
-  (is (equal "213,456.99" (dollars "213456.99")))
-  (is (equal "$-117.50" (dollars -235/2 :comma-char nil :pre-units "$")))
-  (is (equal "$-117.50" (dollars "-117.50" :comma-char nil :pre-units "$")))
-  )
+(def-suite sassetti :description "Test Suite for Sasetti")
+(in-suite sassetti)
 
 (test get-as-list 
   (is (equal (list nil) (get-as-list nil)))
@@ -56,7 +17,7 @@
 	     (get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       ;note"))))
   )
 
-(def-suite string-form :description "Test the object class definitions" :in sassetti-test)
+(def-suite string-form :description "Test the object class definitions" :in sassetti)
 (in-suite string-form)
 
 (test string-form-simple-cases
@@ -90,7 +51,7 @@
   (is (equal "      Expenses:Bureaucracy:Add a space     $-359 ;note"
 	     (string-form (parse-transaction "Expenses:Bureaucracy:Add a space       $-359.00 ;note")))))
 
-(def-suite classes :description "Test the object class definitions" :in sassetti-test)
+(def-suite classes :description "Test the object class definitions" :in sassetti)
 (in-suite classes)
 
 (test make-date
@@ -123,7 +84,7 @@
 
 
 
-(def-suite parser :description "Test the ledger file parser" :in sassetti-test)
+(def-suite parser :description "Test the ledger file parser" :in sassetti)
 (in-suite parser)
 
 (test parse-date
@@ -277,7 +238,7 @@
 
 (defun test-all ()
   (setf *break-on-signals* nil)
-  (run! 'sassetti-test)
+  (run! 'sassetti)
   (setf *break-on-signals* 'error)
   "done")
 ;(test-all)
