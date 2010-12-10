@@ -11,8 +11,9 @@ what ledger would, except for a few minor variations.  First, Sassetti
 is in some places more forgiving than Ledger about whitespace and
 such.  Second and more importantly, Sassetti allows you to include
 lisp commands among your standard Ledger entries.  These get evaluated
-by Sassetti, perhaps generating new entries or changing how data is
-interpreted.
+by Sassetti, and allow you to do such things as dynamically generate
+new entries, change how data is interpreted, and mark old transactions
+as cleared.
 
 Access to Lisp enables you to write entries that are calculated or to
 generate multiple entries with a single line of code.  For example,
