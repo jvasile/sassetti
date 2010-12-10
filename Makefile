@@ -7,6 +7,8 @@ bin:
 docs:
 	make -C doc
 
+doc: docs
+
 clean:
 	make -C doc clean
 	rm -rf bin
