@@ -10,6 +10,11 @@
   (values (/ (round f 1/100) 100) 
 	  (second (multiple-value-list (round f 1/100)))))
 
+(defun truncate-cent (f)
+  "Truncate to the nearest hundreth"
+  (values (/ (truncate f 1/100) 100) 
+	  (second (multiple-value-list (truncate f 1/100)))))
+
 (defun depreciate-recurse (year month category amount term-left err err+)
    "Do the recursive portion of monthly depreciation
 
@@ -17,22 +22,23 @@
   ERR+ is the running total of unaccounted rounding error"
   (if (eq term-left 0) 
       (list)
-      (progn
+      (let ((err+. (truncate-cent err+)))
 	(cons (parse-entry (format nil 
 				   (cat "~a/~a/15 Depreciate ~a~%"
 					"   Assets:Prepaid:~a            $-~f~%"
 					"   Expenses:Depreciation:~a     $~f~%")
 				   year month category
-				   category (if (= 0 (mod err+ 1/100)) (+ amount err+) amount)
-				   category (if (= 0 (mod err+ 1/100)) (+ amount err+) amount)))
+				   category (if (>= err+ 1/100) (+ amount err+.) amount)
+				   category (if (>= err+ 1/100) (+ amount err+.) amount)))
 	      (depreciate-recurse (+ year (floor (/ month 12.0))) 
 				  (+ (mod month 12) 1) 
 				  category 
 				  amount 
 				  (- term-left 1)
 				  err
-				  (if (= 0 (mod err+ 1/100)) err (+ err err+)))))))
-	
+				  (- (+ err err+)
+				     (if (> err+ 1/100) err+. 0)))))))
+
 (defun depreciate (year month category total term)
   "Monthly depreciation"
   (let* ((monthly (round-cent (/ total term)))
