@@ -1,3 +1,6 @@
+;;;; FiveAM testing for Sassetti
+;;;;
+;;;; See COPYING for copyright and licensing information.
 (in-package #:sassetti)
 
 (def-suite sassetti :description "Test Suite for Sasetti")
