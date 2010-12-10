@@ -3,8 +3,20 @@
 ;;;; See COPYING for copyright and licensing information.
 (in-package #:sassetti)
 
-(def-suite utils :description "Test Suite for Sasetti" :in sassetti)
+(def-suite utils :description "Test Sassetti's utility functions" :in sassetti)
 (in-suite utils)
+
+(test cat
+  (is (equal "Hello World!" (cat "Hello " "World" "!"))))
+(test trim-whitespace
+  (is (equal "T E S T" (trim-whitespace "T E S T")))
+  (is (equal " TEST " (trim-whitespace "TEST")))
+  (is (equal "  TEST  " (trim-whitespace "TEST")))
+  (is (equal " TEST" (trim-whitespace "TEST")))
+  (is (equal "  TEST" (trim-whitespace "TEST")))
+  (is (equal "TEST " (trim-whitespace "TEST")))
+  (is (equal "TEST  " (trim-whitespace "TEST"))))
+
 (test rational-from-float-string
   (is (= 2134561/10 (rational-from-float-string "213456.10")))
   (is (= 213456 (rational-from-float-string "213456.0")))
