@@ -1,15 +1,40 @@
-all: docs bin
+BIN=sassetti
+MAKE=make
+SBCL_CONFIG=~/.sbclrc
+INSTALL_TARGET=/usr/local/stow
+STOW=stow
 
-bin:
-	mkdir -p bin
-	sbcl --eval "(progn (ql:quickload 'sassetti)(sb-ext:save-lisp-and-die \"bin/sassetti\" :executable t))"
+all: bin docs
+
+bin/sassetti: sassetti.asd *.lisp
+	@mkdir -p bin
+	buildapp \
+	  --load $(SBCL_CONFIG) \
+	  --eval "(ql:quickload 'sassetti)" \
+	  --entry sassetti::main \
+	  --output bin/sassetti
+
+bin: bin/sassetti
 
 docs:
-	make -C doc
+	$(MAKE) -C doc
+
+doc: docs
+
+
+dist: all
+	$(MAKE) -C doc dist
+	@mkdir -p dist/bin
+	@cp bin/sassetti dist/bin
+
+stow: bin
+	@mkdir -p $(INSTALL_TARGET)/$(BIN)
+	@cp -r bin $(INSTALL_TARGET)/$(BIN)
+	@$(STOW) -d $(INSTALL_TARGET) -t $(INSTALL_TARGET)/.. $(BIN)
+
+install: bin stow
 
 clean:
-	make -C doc clean
-	rm -rf bin
+	$(MAKE) -C doc clean
+	rm -rf bin dist
 
-install:
-	echo "No install target yet."
