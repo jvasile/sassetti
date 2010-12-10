@@ -1,5 +1,5 @@
-PANDOC=`which pandoc`
-PDFLATEX=`which pdflatex`
+PANDOC=@`which pandoc`
+PDFLATEX=@`which pdflatex`
 
 # List text files in the order in which you want them to appear in the
 # complete manual:
