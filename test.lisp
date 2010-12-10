@@ -229,6 +229,7 @@
 
   (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
   (is (equal '("" 1 "") (get-as-list (parse-amount "1"))))
+  (is (equal '("" 1 "") (get-as-list (parse-amount 1))))
 
   (is (equal '("$" -255/2 "") (get-as-list (parse-amount "$-127.50"))))
   )
