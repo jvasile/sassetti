@@ -61,7 +61,10 @@
 
 (test string-form-simple-cases
   (is (equal "!!" (string-form "!!")))
-  (is (equal "" (string-form nil))))
+  (is (equal "" (string-form nil)))
+  (is (equal (format nil "will~%~%this~%~%concatenate~%~%?~%~%") (string-form (list "will" "this" "concatenate" "?"))))
+  (is (equal (format nil "$2~%~%$1~%~%") (string-form
+				      (list  (parse-amount "$2") (parse-amount "$1"))))))
 
 (test string-form-amount
   "Test string-form methods for various objects."

@@ -41,7 +41,6 @@
 (defmethod string-form ((object string) &key w) object)
 (defmethod string-form ((object list) &key w)
   (format nil "~{~a~%~%~}" (mapcar 'string-form object)))
-;  (apply 'concatenate 'string (mapcar 'string-form object)))
 (defgeneric units (object)
   (:documentation "Returns the units string of an object, trimmed of whitespace."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
