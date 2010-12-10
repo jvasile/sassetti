@@ -40,6 +40,8 @@
   (is (equal "$64.45" (string-form (parse-amount "$64.44") :adjust 1/100)))
   (is (equal "$64.01" (string-form (parse-amount "$64") :adjust 1/100)))
   (is (equal "$65" (string-form (parse-amount "$64.99") :adjust 1/100)))
+  (is (equal "$-765" (string-form (parse-amount "$765") :neg-p t)))
+  (is (equal "$765" (string-form (parse-amount "$-765") :neg-p t)))
   (is (equal "$62,809.29" (string-form (parse-amount "$-11") :replace 6280929/100 :commas-p t))))
 
 (test string-form-date
