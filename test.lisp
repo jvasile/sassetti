@@ -1,9 +1,9 @@
 (in-package #:sassetti)
 
-(def-suite sassetti-test :description "Test Suite for Sasetti")
-(in-suite sassetti-test)
+(def-suite sassetti :description "Test Suite for Sasetti")
+(in-suite sassetti)
 
-(def-suite utils :description "Test Suite for Sasetti" :in sassetti-test)
+(def-suite utils :description "Test Suite for Sasetti" :in sassetti)
 (in-suite utils)
 (test rational-from-float-string
   (is (= 2134561/10 (rational-from-float-string "213456.10")))
@@ -58,7 +58,7 @@
 	     (get-as-list (parse-transaction "  Expenses:Bureaucracy:Add a space       ;note"))))
   )
 
-(def-suite string-form :description "Test the object class definitions" :in sassetti-test)
+(def-suite string-form :description "Test the object class definitions" :in sassetti)
 (in-suite string-form)
 
 (test string-form-simple-cases
@@ -89,7 +89,7 @@
   (is (equal "      Expenses:Bureaucracy:Add a space     $-359 ;note"
 	     (string-form (parse-transaction "Expenses:Bureaucracy:Add a space       $-359.00 ;note")))))
 
-(def-suite classes :description "Test the object class definitions" :in sassetti-test)
+(def-suite classes :description "Test the object class definitions" :in sassetti)
 (in-suite classes)
 
 (test make-date
@@ -122,7 +122,7 @@
 
 
 
-(def-suite parser :description "Test the ledger file parser" :in sassetti-test)
+(def-suite parser :description "Test the ledger file parser" :in sassetti)
 (in-suite parser)
 
 (test parse-date
@@ -276,7 +276,7 @@
 
 (defun test-all ()
   (setf *break-on-signals* nil)
-  (run! 'sassetti-test)
+  (run! 'sassetti)
   (setf *break-on-signals* 'error)
   "done")
 ;(test-all)
