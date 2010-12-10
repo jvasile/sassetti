@@ -20,22 +20,24 @@ using the built-in function `depreciate`, we can schedule depreciation
 for an asset over a length of time.  This will depreciate your gym
 membership over three months:
 
-`(depreciate 2010 03 "3 month gym membership" $225 3)
+`(depreciate 2010 03 "3 month gym membership" $199 3)`
 
 That one line generates three entries and schedules them
-appropriately:
+appropriately.  It even takes care of rounding:
 
-`2010/3/15 Depreciate 3 month gym membership
-   Assets:Prepaid:3 month gym membership            $-75
-   Expenses:Depreciation:3 month gym membership     $75
+`2010/03/15 Depreciate 3 month gym membership
+      Assets:Prepaid:3 month gym membership            $-66.33
+      Expenses:Depreciation:3 month gym membership     $66.33
+                                                       
 
-2010/4/15 Depreciate 3 month gym membership
-   Assets:Prepaid:3 month gym membership            $-75
-   Expenses:Depreciation:3 month gym membership     $75
+2010/04/15 Depreciate 3 month gym membership
+      Assets:Prepaid:3 month gym membership            $-66.33
+      Expenses:Depreciation:3 month gym membership     $66.33
+                                                       
 
-2010/5/15 Depreciate 3 month gym membership
-   Assets:Prepaid:3 month gym membership            $-75
-   Expenses:Depreciation:3 month gym membership     $75`
+2010/05/15 Depreciate 3 month gym membership
+      Assets:Prepaid:3 month gym membership            $-66.34
+      Expenses:Depreciation:3 month gym membership     $66.34`                                                       
 
 Sassetti integrates into your workflow in two ways.  It can parse your
 ledger file and perform many of the same functions as Ledger itself.
