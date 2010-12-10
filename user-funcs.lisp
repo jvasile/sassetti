@@ -10,54 +10,34 @@
   (values (/ (round f 1/100) 100) 
 	  (second (multiple-value-list (round f 1/100)))))
 
-(defun depreciate-recurse (year month category amount term-left)
-  "Do the recursive portion of monthly depreciation"
-  (cat (format nil 
-	       (cat "~a/~a/15 Depreciate ~a~%"
-		    "   Assets:Prepaid:~a            $-~f~%"
-		    "   Expenses:Depreciation:~a     $~f~%~%" )
-	       year month category
-	       category amount
-	       category amount)
-       (unless (eq term-left 1)
-	 (depreciate-recurse (+ year (floor (/ month 12.0))) 
-			     (+ (mod month 12) 1) 
-			     category 
-			     amount 
-			     (- term-left 1)))))
+(defun depreciate-recurse (year month category amount term-left err err+)
+   "Do the recursive portion of monthly depreciation
 
-(defun depreciate-recurse (year month category amount term-left)
-  "Do the recursive portion of monthly depreciation"
-  (if (eq term-left 0)
+  ERR is the monthly round error we have to account for
+  ERR+ is the running total of unaccounted rounding error"
+  (if (eq term-left 0) 
       (list)
-      (cons (parse-entry (format nil 
-				 (cat "~a/~a/15 Depreciate ~a~%"
-				      "   Assets:Prepaid:~a            $-~f~%"
-				      "   Expenses:Depreciation:~a     $~f" )
-				 year month category
-				 category amount
-				 category amount))
-	    (depreciate-recurse (+ year (floor (/ month 12.0))) 
-				(+ (mod month 12) 1) 
-				category 
-				amount 
-				(- term-left 1)))))
-
+      (progn
+	(cons (parse-entry (format nil 
+				   (cat "~a/~a/15 Depreciate ~a~%"
+					"   Assets:Prepaid:~a            $-~f~%"
+					"   Expenses:Depreciation:~a     $~f~%")
+				   year month category
+				   category (if (= 0 (mod err+ 1/100)) (+ amount err+) amount)
+				   category (if (= 0 (mod err+ 1/100)) (+ amount err+) amount)))
+	      (depreciate-recurse (+ year (floor (/ month 12.0))) 
+				  (+ (mod month 12) 1) 
+				  category 
+				  amount 
+				  (- term-left 1)
+				  err
+				  (if (= 0 (mod err+ 1/100)) err (+ err err+)))))))
+	
 (defun depreciate (year month category total term)
   "Monthly depreciation"
-  (let* ((amount (round-cent (/ total (float term))))
-	(rounding-error (round-cent (- total (* amount term)))))
-    (if (= 0 rounding-error)
-        (depreciate-recurse year month category amount term)
-	(cons (parse-entry (format nil 
-				    (cat "~d/~d/15 Depreciation Rounding Fix~%"
-					 "   Assets:Prepaid:~a            $~f~%"
-					 "   Expenses:Depreciation:~a     $~f"
-					 )
-				    (round (/ (+ (* year 12) term) 12.0)) (+ (mod (+ month (- term 1)) 12) 1)
-				    category (* -1 rounding-error)
-				    category rounding-error))
-	      (depreciate-recurse year month category amount term)))))
+  (let* ((monthly (round-cent (/ total term)))
+	(rounding-error (/ (- total (* monthly term)) term)))
+    (depreciate-recurse year month category monthly term rounding-error rounding-error)))
 
 (defun unbillable (date description category amount)
   "Charge off unbillable work"
