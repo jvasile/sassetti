@@ -58,8 +58,16 @@
   "))
 (defmethod units ((self amount))
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
-(defmethod string-form ((self amount) &key (commas-p nil))
-  (dollars (quantity self) 
+(defmethod string-form ((self amount) &key (commas-p nil) (adjust 0) (replace nil))
+  "Set COMMAS-P to true to return 1000 as 1,000
+
+  Amount's quantity will be adjusted by amount ADJUST in the return
+  string.  This lets you print figures with rounding fixes a little
+  more easily.
+
+  If you set REPLACE, amount will be set to that value in the return
+  string."
+  (dollars (if replace replace (+ adjust (quantity self)))
 	   :comma-char (if commas-p #\, nil)
 	   :pre-units (units-before self) :post-units (units-after self)))
 (defmethod get-as-list ((self amount))
