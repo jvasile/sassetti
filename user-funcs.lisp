@@ -7,7 +7,8 @@
 
 (defun round-cent (f)
   "Round to the nearest hundreth"
-  (/ (round f 0.01) 100))
+  (values (/ (round f 1/100) 100) 
+	  (second (multiple-value-list (round f 1/100)))))
 
 (defun depreciate-recurse (year month category amount term-left)
   "Do the recursive portion of monthly depreciation"
