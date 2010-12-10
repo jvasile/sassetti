@@ -18,6 +18,8 @@
   (is (= -11651/100 (rational-from-float-string "-116.51")))
   (is (= 11749/100 (rational-from-float-string "117.49")))
   (is (= 11651/100 (rational-from-float-string "116.51")))
+  (is (= 1/25 (rational-from-float-string "0.04")))
+  (is (= -1/25 (rational-from-float-string "-0.04")))
   )
 (test dollars
   (is (equal "123,112" (dollars 123112.00)))
@@ -41,6 +43,8 @@
   (is (equal "213,456.99" (dollars "213456.99")))
   (is (equal "$-117.50" (dollars -235/2 :comma-char nil :pre-units "$")))
   (is (equal "$-117.50" (dollars "-117.50" :comma-char nil :pre-units "$")))
+  (is (equal "0.06" (dollars "0.06")))
+  (is (equal "-0.06" (dollars "-0.06")))
   )
 
 (test get-as-list 
