@@ -1,0 +1,14 @@
+*#
+.#*
+bin/
+dist/
+doc/#*
+doc/.#*
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/*.pdf
+doc/*.tex
+doc/*.toc
+doc/sassetti.1
+*.fasl
