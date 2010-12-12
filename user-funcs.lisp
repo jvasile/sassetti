@@ -5,6 +5,12 @@
 ;;;; See COPYING for copyright and licensing information.
 (in-package #:sassetti)
 
+;; This macro allows you to write $5 instead of "$5" when specifying dollars in your ledger file.
+;; If you use ¥ instead, you can change the $ below to ¥.
+(set-macro-character #\$
+                     #'(lambda (stream char)
+                         (cat (string char) (write-to-string (read stream)))))
+
 (defun round-cent (f)
   "Round to the nearest hundreth"
   (values (/ (round f 1/100) 100) 
@@ -25,11 +31,11 @@
       (let ((err+. (truncate-cent err+)))
 	(cons (parse-entry (format nil 
 				   (cat "~a/~a/15 Depreciate ~a~%"
-					"   Assets:Prepaid:~a            $-~f~%"
-					"   Expenses:Depreciation:~a     $~f~%")
+					"   Assets:Prepaid:~a            ~a~%"
+					"   Expenses:Depreciation:~a     ~a~%")
 				   year month category
-				   category (if (>= err+ 1/100) (+ amount err+.) amount)
-				   category (if (>= err+ 1/100) (+ amount err+.) amount)))
+				   category (string-form amount :neg-p t :adjust (if (>= err+ 1/100) err+. 0))
+				   category (string-form amount :adjust (if (>= err+ 1/100) err+. 0))))
 	      (depreciate-recurse (+ year (floor (/ month 12.0))) 
 				  (+ (mod month 12) 1) 
 				  category 
@@ -41,9 +47,11 @@
 
 (defun depreciate (year month category total term)
   "Monthly depreciation"
-  (let* ((monthly (round-cent (/ total term)))
-	(rounding-error (/ (- total (* monthly term)) term)))
-    (depreciate-recurse year month category monthly term rounding-error rounding-error)))
+  (let* ((amount (parse-amount total))
+	 (monthly (round-cent (/ (quantity amount) term)))
+	 (rounding-error (/ (- (quantity amount) (* monthly term)) term)))
+    (setf (quantity amount) monthly)
+    (depreciate-recurse year month category amount term rounding-error rounding-error)))
 
 (defun unbillable (date description category amount)
   "Charge off unbillable work"

@@ -16,10 +16,14 @@
 	   (coerce (second (multiple-value-list (scan-to-strings "(\\d+)?\\D?\\b(\\d+)\\D(\\d+)\\s*$" date))) 'list))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun parse-amount (s)
-  "Parse a portion of the amount that is a number and a symbol.
-  Return an amount object with the number and symbol extracted
+  "S is a string.
+
+  Parse a portion of the amount that is a number and a symbol.  Return
+  an amount object with the number and symbol extracted
   appropriately."
 
+  (unless (stringp s)
+    (setf s (write-to-string s)))
   (if (equal #\@ (char s 0))
     (parse-amount (subseq s 1))
     (let* ((price (scan-to-strings "(-?[,.\\d]+)\\s*$" s))

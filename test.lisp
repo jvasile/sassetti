@@ -36,7 +36,15 @@
   (is (equal "$1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "$" :units-after ""))))
   (is (equal "HKD 1.95" (string-form (make-instance 'amount :quantity 1.95 :units-before "HKD " :units-after ""))))
   (is (equal "$-117.50" (string-form (parse-amount "$-117.50"))))
-  (is (equal "$-117" (string-form (parse-amount "$-117")))))
+  (is (equal "$-11,700" (string-form (parse-amount "$-11700") :commas-p t)))
+  (is (equal "$64.45" (string-form (parse-amount "$64.44") :adjust 1/100)))
+  (is (equal "$64.01" (string-form (parse-amount "$64") :adjust 1/100)))
+  (is (equal "$65" (string-form (parse-amount "$64.99") :adjust 1/100)))
+  (is (equal "$-765" (string-form (parse-amount "$765") :neg-p t)))
+  (is (equal "$765" (string-form (parse-amount "$-765") :neg-p t)))
+  (is (equal "$62,809.29" (string-form (parse-amount "$-11") :replace 6280929/100 :commas-p t)))
+  (is (equal "$-65" (string-form (parse-amount "$64.99") :adjust 1/100 :neg-p t)))
+  (is (equal "$-31" (string-form (parse-amount "$64.99") :adjust 1/100 :neg-p t :replace 30.99))))
 
 (test string-form-date
   (is (equal "1975/11/12" (string-form (make-instance 'date :year 1975 :month 11 :day 12))))
@@ -221,6 +229,7 @@
 
   (is (equal '("" 0 "$") (get-as-list (parse-amount "$"))))
   (is (equal '("" 1 "") (get-as-list (parse-amount "1"))))
+  (is (equal '("" 1 "") (get-as-list (parse-amount 1))))
 
   (is (equal '("$" -255/2 "") (get-as-list (parse-amount "$-127.50"))))
   )
