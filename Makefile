@@ -1,24 +1,22 @@
 BIN=sassetti
-MAKE=make
 SBCL_CONFIG=~/.sbclrc
 INSTALL_TARGET=/usr/local/stow
+MAKE=make
 STOW=stow
 
 all: bin docs
 
-bin/sassetti: sassetti.asd *.lisp
+bin/sassetti: sassetti.asd *.lisp Makefile
 	@mkdir -p bin
 	buildapp \
 	  --load $(SBCL_CONFIG) \
 	  --eval "(ql:quickload 'sassetti)" \
 	  --entry sassetti::main \
 	  --output bin/sassetti
-
 bin: bin/sassetti
 
 docs:
 	$(MAKE) -C doc
-
 doc: docs
 
 
@@ -27,12 +25,21 @@ dist: all
 	@mkdir -p dist/bin
 	@cp bin/sassetti dist/bin
 
-stow: bin
-	@mkdir -p $(INSTALL_TARGET)/$(BIN)
-	@cp -r bin $(INSTALL_TARGET)/$(BIN)
-	@$(STOW) -d $(INSTALL_TARGET) -t $(INSTALL_TARGET)/.. $(BIN)
+stow: bin dist
+	rm -rf $(INSTALL_TARGET)/$(BIN)/*
+	mkdir -p $(INSTALL_TARGET)/$(BIN)/share/man/man1 $(INSTALL_TARGET)/$(BIN)/share/doc/$(BIN)
+	cp -r bin $(INSTALL_TARGET)/$(BIN)
+	cp dist/doc/sassetti.1 $(INSTALL_TARGET)/$(BIN)/share/man/man1
+	cp dist/doc/* $(INSTALL_TARGET)/$(BIN)/share/doc/$(BIN)
+	$(STOW) --restow -d $(INSTALL_TARGET) -t $(INSTALL_TARGET)/.. $(BIN)
+	mandb
 
-install: bin stow
+unstow:
+	$(STOW) --delete -d $(INSTALL_TARGET) -t $(INSTALL_TARGET)/.. $(BIN)
+	rm -rf $(INSTALL_TARGET)/$(BIN)
+
+install:
+	@echo Run \'make stow\' to install via GNU stow.  You might need to \'apt-get install stow\' first.
 
 clean:
 	$(MAKE) -C doc clean
