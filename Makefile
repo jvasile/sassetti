@@ -4,15 +4,19 @@ INSTALL_TARGET=/usr/local/stow
 MAKE=make
 STOW=stow
 
+
+
 all: bin docs
 
 bin/sassetti: sassetti.asd *.lisp Makefile
 	@mkdir -p bin
 	buildapp \
 	  --load $(SBCL_CONFIG) \
-	  --eval "(ql:quickload 'sassetti)" \
+	  --eval "(progn (ql:quickload 'sassetti)) (setf *debugger-hook* 'sassetti::debug-ignore))" \
 	  --entry sassetti::main \
-	  --output bin/sassetti
+	  --output bin/$(BIN) || \
+	bash -c 'if [ "`file bin/$(BIN)`" == "bin/$(BIN): ASCII text" ]; then rm -f bin/$(BIN); fi'
+
 bin: bin/sassetti
 
 docs:
