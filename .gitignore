@@ -12,3 +12,12 @@ doc/*.tex
 doc/*.toc
 doc/sassetti.1
 *.fasl
+doc/COPYING.html
+doc/COPYING.txt
+doc/INSTALL.html
+doc/INSTALL.txt
+doc/README.html
+doc/README.txt
+doc/colophon.html
+doc/hacking.html
+doc/sassetti.html
