@@ -175,8 +175,26 @@
     (format stream "~a" (string-form (parse-ledger-file fname)))))
 
 ;(preprocess-ledger-file *ledger-fname*)
+(defun debug-ignore (c h) (declare (ignore h)) (print c) (abort))
 
 (defun main (argv)
-  (print (second argv))
-  (write-line "Hello, world")
-  )
+  (let ((*opt-spec*
+	 '((("all" #\a) :type boolean :documentation "do it all")
+	   ("blah" :type string :initial-value "blob" :documentation "This is a very long multi line documentation. The function SHOW-OPTION-HELP should display this properly indented, that is all lines should start at the same column.")
+	   (("verbose" #\v) :type boolean :documentation "include debugging output")
+	   (("file" #\f) :type string :documentation "read from file instead of standard input")
+	   (("xml-port" #\x) :type integer :optional t :documentation "specify port for an XML listener")
+	   (("http-port" #\h) :type integer :initial-value 80 :documentation "specify port for an HTTP listener")
+	   ("enable-cache" :type boolean :documentation "enable cache for queries")
+	   ("path" :type string :list t :optional t :documentation "add given directory to the path")
+	   ("port" :type integer :list (:initial-contents (1 2)) :optional t :documentation "add a normal listen on given port"))))
+
+
+  ;(sb-impl::toplevel-repl nil)
+    (multiple-value-bind (options args) (process-command-line-options *opt-spec* (cdr argv))
+      (write options) 
+      (write args)
+      (mapcar 'preprocess-ledger-file args)
+      )
+    ))
+(main '("bin/sassetti" "/home/vasile/personal/ocs/main.ledger.lisp"))

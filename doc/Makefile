@@ -47,8 +47,8 @@ sassetti.html: $(SOURCES) Makefile
 html: $(HTML)
 ###############################################################################
 %.pdf: %.tex Makefile
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<  # yes, do it twice so the toc works
+	$(PDFLATEX) -interaction=batchmode $< >/dev/null
+	$(PDFLATEX) -interaction=batchmode $< >/dev/null  # yes, do it twice so the toc works
 
 pdf: $(PDF)
 ###############################################################################
@@ -58,5 +58,5 @@ clean-latex:
 
 clean: clean-latex
 	rm -rf $(OUTPUTS)
-	rm -rf README.txt INSTALL.txt COPYING.txt
-	rm copyright_notice0?
+	rm -f README.txt INSTALL.txt COPYING.txt
+	rm -f copyright_notice0?
