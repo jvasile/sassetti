@@ -26,7 +26,8 @@
 ;(ql:quickload 'sassetti)
 (in-package #:sassetti)
 
-(defparameter *ledger-fname* "~/personal/ocs/main.ledger.lisp" "Ledger file name")
+(defvar *ledger-fname* "main.ledger.lisp" "Ledger file name")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgeneric get-as-list (object)
   (:documentation "Return the slots of object as a list.  This is
@@ -35,12 +36,10 @@
   tests."))
 (defmethod get-as-list ((object NULL))
   (list object))
-(defgeneric string-form (object &key &allow-other-keys)
+(defgeneric string-form (object)
   (:documentation "Return the object in ledger-format string form."))
-(defmethod string-form ((object NULL) &key w) "")
-(defmethod string-form ((object string) &key w) object)
-(defmethod string-form ((object list) &key w)
-  (format nil "~{~a~%~%~}" (mapcar 'string-form object)))
+(defmethod string-form ((object NULL))
+  "")
 (defgeneric units (object)
   (:documentation "Returns the units string of an object, trimmed of whitespace."))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,10 +57,17 @@
   "))
 (defmethod units ((self amount))
   (cat (trim-whitespace (units-before self)) (trim-whitespace (units-after self))))
-(defmethod string-form ((self amount) &key (commas-p nil))
-  (dollars (quantity self) 
-	   :comma-char (if commas-p #\, nil)
-	   :pre-units (units-before self) :post-units (units-after self)))
+(defun dollar (amount)
+  "Print dollar amount, complete with commas and appropriate end-zero
+  padding (no dollar sign, though)."
+  (let* ((int (truncate (/ (round (* amount 100)) 100.0)))
+	 (decimal-places 2)
+	 (frac (round (* (expt 10 decimal-places) (- amount int) ))))
+    (if (= frac 0)
+	(format nil "~:D" int)
+	(format nil "~:D.~V,'0D" int decimal-places frac))))
+(defmethod string-form ((self amount))
+  (format nil "~a~a~a" (units-before self) (dollar (quantity self)) (units-after self)))
 (defmethod get-as-list ((self amount))
   (list (units-before self) (quantity self) (units-after self)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -75,23 +81,17 @@
    ))
 (defmethod get-as-list ((self transaction))
   (list (account self) (get-as-list (commodity self)) (get-as-list (unit-price self)) (cleared self) (pending self) (note self)))
-(defmethod account-width ((self transaction))
-  "Return the length in chars of the account slot"
-  (length (account self)))
-(defmethod string-form ((self transaction) &key width)
-  "Width is the length in chars to use for the account slot.  It
-  allows us to make the amounts for an entry line up."
-  (format nil "   ~3a~va     ~a~a~a"
+(defmethod string-form ((self transaction))
+  (format nil "   ~a~a     ~a~a~a"
 	  (if (or (cleared self) (pending self))
 	      (format nil "~a~a " 
 		      (if (cleared self) "*" "")
 		      (if (pending self) "!" ""))
 	      "")
-	  width
 	  (account self)
 	  (string-form (commodity self))
 	  (string-form (unit-price self))
-	  (cat (if (equal "" (note self)) "" " ;") (note self))
+	  (cat (if (equal "" (note self)) "" ";") (note self))
 	  ))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass date ()
@@ -100,10 +100,10 @@
    (day :accessor day :initarg :day)))
 (defmethod get-as-list ((self date))
   (list (year self) (month self) (day self)))
-(defmethod string-form ((self date) &key w)
+(defmethod string-form ((self date))
   (if (year self)
-      (format nil "~a/~2,'0d/~2,'0d" (year self) (month self) (day self))
-      (format nil "~2,'0d/~2,'0d" (month  self) (day self))))
+      (format nil "~a-~2,'0d-~2,'0d" (year self) (month self) (day self))
+      (format nil "~2,'0d-~2,'0d" (month  self) (day self))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass entry ()
   ((date :accessor date :initarg :date :initform nil)
@@ -116,46 +116,68 @@
    ))
 
 (defmethod get-as-list ((self entry))
+  "TODO: handle transactions"
   (list (string-form (date self))
 	(if (effective-date self) (string-form (effective-date self)) nil)
 	(desc self)
 	(cleared self)
 	(pending self)
 	(code self)
-	(mapcar 'get-as-list (transactions self))))
+	(transactions self)))
 
-(defmethod string-form ((self entry) &key w)
-  (let ((width (if (transactions self)
-		   (apply 'max (mapcar (lambda (trans) (length (account trans))) (transactions self)))
-		   0)))
-    (format nil "~a~a ~a~a~a~{~%~a~}" 
-	    (string-form (date self)) 
-	    (if (effective-date self)
-		(cat "=" (string-form (effective-date self)))
-		"")
-	    (if (or (cleared self) (pending self))
-		(format nil "~a~a " 
-			(if (cleared self) "*" "")
-			(if (pending self) "!" ""))
-		"")
-	    (if (code self) (format nil "(~a) " (code self)) "")
-	    (desc self)
-	    (mapcar (lambda (trans) (string-form trans :width width)) (transactions self)))))
+(defmethod string-form ((self entry))
+  "TODO: handle transactions"
+  (format nil "~a~a ~a~a~a~{~%~a~}" 
+	  (string-form (date self)) 
+	  (if (effective-date self)
+	      (cat "=" (string-form (effective-date self)))
+	      "")
+	  (if (or (cleared self) (pending self))
+	      (format nil "~a~a " 
+		      (if (cleared self) "*" "")
+		      (if (pending self) "!" ""))
+	      "")
+	  (if (code self) (format nil "(~a) " (code self)) "")
+	  (desc self)
+	  (mapcar 'string-format (transactions self))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defclass ledger ()
-  ((fname :accessor fname :initarg :fname :initform "")
-   (entries :accessor entries :initarg :entries :initform nil)
+  ((fname :accessor fname :initarg :fname)
+   (entries :accessor entries)
    (curr-ledger-year :accessor curr-ledger-year 
 		     :initarg curr-ledger-year
 		     :documentation "The year that ledger entries are assumed to be in")
    ))
-(defmethod string-form ((self ledger) &key w)
-  (format nil "~{~a~%~%~}" (mapcar 'string-form (entries self))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun preprocess-ledger-file (fname)
-  (with-open-file (stream (cat (tilde:expand-tilde-namestring fname) ".gen")
-			  :direction :OUTPUT
-			  :if-exists :SUPERSEDE)
-    (format stream "~a" (string-form (parse-ledger-file fname)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;(preprocess-ledger-file *ledger-fname*) 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun split-ledger-file (fname)
+  (let ((transactions (list ""))
+	(leading-whitespace "^[^\\w\\(\\)]"))
+    (with-open-file (stream fname)
+      (loop for line = (read-line stream nil)
+	 while line
+	 do
+	   (unless (or (scan (cat leading-whitespace "*;") line)
+		       (scan (cat leading-whitespace "*$") line))
+	     (if (scan leading-whitespace line)
+		 (setf (car transactions) (format nil "~a~%~a" (car transactions) line))
+		 (push line transactions)))))
+      (nreverse transactions)))
+
+;(defun preprocess-ledger-file (fname)
+;  (with-open-file (stream (cat fname ".gen")
+;			  :direction :OUTPUT
+;			  :if-exists :SUPERSEDE)
+ ;   (mapcar (lambda (line)
+;	      (format stream "~a~%~%" line))
+;	    (parse-ledger-file (split-ledger-file fname)))))
 ;(preprocess-ledger-file *ledger-fname*)
+
+(defun main (argv)
+  (print (second argv))
+  (write-line "Hello, world")
+  )
