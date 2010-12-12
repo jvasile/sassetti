@@ -6,13 +6,13 @@ PDFLATEX=pdflatex
 # List text files in the order in which you want them to appear in the
 # complete manual:
 SOURCES=README.txt INSTALL.txt hacking.txt COPYING.txt colophon.txt
+MAN_SOURCES=$(patsubst COPYING.txt,copyright_notice00,$(SOURCES))
 
 HTML=sassetti.html $(patsubst %.txt,%.html,$(SOURCES))
 LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(SOURCES))
 PDF=sassetti.pdf $(patsubst %.txt,%.pdf,$(SOURCES))
 MAN=sassetti.1
 OUTPUTS=$(PDF) $(LATEX) $(HTML) $(MAN)
-
 
 all: $(OUTPUTS)
 
@@ -23,8 +23,10 @@ dist: all
 $(SOURCES):
 	ln -s ../`echo $@ | sed -e 's/.txt$$//'` $@
 ###############################################################################
-$(MAN): Makefile
-	$(PANDOC) -s -t man -o $@ $(SOURCES)
+$(MAN): Makefile $(SOURCES)
+	@csplit -s -f copyright_notice COPYING.txt '/##/'
+	$(PANDOC) -s -t man -o $@ $(MAN_SOURCES)
+	@rm copyright_notice0?
 manpages: $(MAN)
 ###############################################################################
 %.tex: %.txt Makefile
@@ -56,3 +58,4 @@ clean-latex:
 clean: clean-latex
 	rm -rf $(OUTPUTS)
 	rm -rf README.txt INSTALL.txt COPYING.txt
+	rm copyright_notice0?
