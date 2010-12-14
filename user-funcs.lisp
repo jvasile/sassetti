@@ -45,7 +45,9 @@
 				  (- (+ err err+)
 				     (if (>= err+ 1/100) err+. 0)))))))
 (defun depreciate (year month category total term)
-  "Monthly depreciation"
+  "Monthly depreciation.
+
+  TODO: do depreciation on specified day of month"
   (let* ((amount (parse-amount total))
 	 (monthly (round-cent (/ (quantity amount) term)))
 	 (rounding-error (/ (- (quantity amount) (* monthly term)) term)))
