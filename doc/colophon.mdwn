@@ -5,3 +5,14 @@ to pdf, html, troff and latex using pandoc and pdflatex.
 
 The complete source code to this manual is available in the 'doc'
 directory of the Sassetti source distribution.
+
+## Who was Sassetti?
+
+[Francesco Sassetti](http://en.wikipedia.org/wiki/Francesco_Sassetti)
+was a 15th century Florentine banker noted by history more for the
+honesty and accuracy of his books than the success of his banks.
+
+Ledger is a great and accurate tool, but is a niche program.  This
+Lisp wrapper for Ledger could only be of interest to an extremely
+small subset of Ledger's already small audience.  Sassetti seemed like
+an accurate, if not auspicious, fit.
