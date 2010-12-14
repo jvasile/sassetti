@@ -24,6 +24,7 @@
 ;;;; See COPYING for copyright and licensing information.
 
 ;(ql:quickload 'sassetti)
+;(ql:quickload 'sassetti-test)
 (in-package #:sassetti)
 
 (defparameter *ledger-fname* "~/personal/ocs/main.ledger.lisp" "Ledger file name")
@@ -177,24 +178,29 @@
 ;(preprocess-ledger-file *ledger-fname*)
 (defun debug-ignore (c h) (declare (ignore h)) (print c) (abort))
 
+(defun parse-argv (opt-spec argv)
+  (multiple-value-bind (options args) (process-command-line-options opt-spec (cdr argv))
+    (values options (pop args) args (getf options ':FILE)))))
+
 (defun main (argv)
-  (let ((*opt-spec*
-	 '((("all" #\a) :type boolean :documentation "do it all")
-	   ("blah" :type string :initial-value "blob" :documentation "This is a very long multi line documentation. The function SHOW-OPTION-HELP should display this properly indented, that is all lines should start at the same column.")
-	   (("verbose" #\v) :type boolean :documentation "include debugging output")
-	   (("file" #\f) :type string :documentation "read from file instead of standard input")
-	   (("xml-port" #\x) :type integer :optional t :documentation "specify port for an XML listener")
-	   (("http-port" #\h) :type integer :initial-value 80 :documentation "specify port for an HTTP listener")
-	   ("enable-cache" :type boolean :documentation "enable cache for queries")
-	   ("path" :type string :list t :optional t :documentation "add given directory to the path")
-	   ("port" :type integer :list (:initial-contents (1 2)) :optional t :documentation "add a normal listen on given port"))))
-
-
-  ;(sb-impl::toplevel-repl nil)
-    (multiple-value-bind (options args) (process-command-line-options *opt-spec* (cdr argv))
-      (write options) 
-      (write args)
-      (mapcar 'preprocess-ledger-file args)
-      )
-    ))
-(main '("bin/sassetti" "/home/vasile/personal/ocs/main.ledger.lisp"))
+  (in-package #:sassetti)
+  (let ((valid-commands '("bal" "balance" "reg" "register" "print" "xml" "emacs" "equity"
+			  "parse" "prices" "pricedb" "entry"))
+	(opt-spec
+	 '((("help" #\h) :type boolean :documentation "display this help")
+	   (("file" #\f) :type string :documentation "read from file instead of environment variable SASETTI_FILE or LEDGER_FILE")
+	   (("verbose" #\v) :type boolean :documentation "include debugging output (not implemented)")
+	   (("debugger" #\d) :type boolean :documentation "enable the interactive debugger (not implemented-- it's always enabled)")
+	   )))
+    (multiple-value-bind (options command args file) (parse-argv opt-spec argv)
+      (cond ((or (not (or options args command)) (getf options ':HELP))
+	     (show-option-help opt-spec))
+	    ((not (find command valid-commands :test 'equal))
+	     (format t "Error: Unrecognized command '~a'" command))
+	    ((equal command "parse")
+	     (preprocess-ledger-file file))))))
+;(main '("bin/sassetti"))
+;(main '("bin/sassetti" "/home/vasile/personal/ocs/main.ledger.lisp"))
+;(main '("bin/sassetti" "-f" "/home/vasile/personal/ocs/main.ledger.lisp" "parse"))
+;(main '("bin/sassetti" "-h" "-d"))
+;(main '("bin/sassetti" "-v" "test"))

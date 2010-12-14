@@ -245,7 +245,9 @@
   (is (equal "$350" (string-form (parse-amount-complex "$350"))))
   )
 
-(defun test-all ()
+(defun test-all (&optional argv)
+  (declare (ignore argv))
+  (format t "Running tests... this will take some time...~%")
   (setf *break-on-signals* nil)
   (run! 'sassetti)
   (setf *break-on-signals* 'error)

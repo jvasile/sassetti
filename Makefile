@@ -5,31 +5,45 @@ MAKE=make
 STOW=stow
 
 
+## Catch-all tagets
+default: bin docs dist
+all: default test
 
-all: bin docs
-
+## Content targets
 bin/sassetti: sassetti.asd *.lisp Makefile
 	@mkdir -p bin
 	buildapp \
 	  --load $(SBCL_CONFIG) \
-	  --eval "(progn (ql:quickload 'sassetti)) (setf *debugger-hook* 'sassetti::debug-ignore))" \
+	  --eval "(ql:quickload 'sassetti)" \
 	  --entry sassetti::main \
 	  --output bin/$(BIN) || \
 	bash -c 'if [ "`file bin/$(BIN)`" == "bin/$(BIN): ASCII text" ]; then rm -f bin/$(BIN); fi'
-
 bin: bin/sassetti
+
+bin/sassetti-test: sassetti-test.asd *.lisp Makefile
+	@mkdir -p bin
+	buildapp \
+	  --load $(SBCL_CONFIG) \
+	  --eval "(ql:quickload 'sassetti-test)" \
+	  --entry sassetti::test-all \
+	  --output bin/$(BIN)-test || \
+	bash -c 'if [ "`file bin/$(BIN)-test`" == "bin/$(BIN)-test: ASCII text" ]; then rm -f bin/$(BIN)-test; fi'
+test: bin/sassetti-test
 
 docs:
 	$(MAKE) -C doc
 doc: docs
 
 
-dist: all
+## Distribution targets
+dist: default
 	$(MAKE) -C doc dist
 	@mkdir -p dist/bin
 	@cp bin/sassetti dist/bin
 
-stow: bin dist
+
+## Install targets
+stow: default
 	rm -rf $(INSTALL_TARGET)/$(BIN)/*
 	mkdir -p $(INSTALL_TARGET)/$(BIN)/share/man/man1 $(INSTALL_TARGET)/$(BIN)/share/doc/$(BIN)
 	cp -r bin $(INSTALL_TARGET)/$(BIN)
@@ -43,7 +57,8 @@ unstow:
 	rm -rf $(INSTALL_TARGET)/$(BIN)
 
 install:
-	@echo Run \'make stow\' to install via GNU stow.  You might need to \'apt-get install stow\' first.
+	@echo Run \'make stow\' to install via GNU stow.  
+	@echo You might need to install and configure stow first \(\'apt-get install stow\'\).
 
 clean:
 	$(MAKE) -C doc clean

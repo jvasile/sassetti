@@ -1,4 +1,5 @@
 # Quick Start
+
 ## Installing Sassetti
 
 First, put all the files in the Sassetti distribution (e.g. this directory)
@@ -6,31 +7,39 @@ in a convenient place (e.g. ~/src/lisp/sassetti).
 
 Second, you need to tell your lisp install where that place is.
 Sassetti relies on Zach Beane's Quicklisp system for loading
-dependencies, so link sassetti.asd to some place quicklisp can find
+dependencies, so link sassetti.asd to some place Quicklisp can find
 it.  On my box, I do:
 
     ln -s ~/src/list/sassetti/sassetti.asd ~/quicklisp/quicklisp/
 
+If you want the test suite, make a symlink for the tests too:
+
+    ln -s ~/src/list/sassetti/sassetti-test.asd ~/quicklisp/quicklisp/
+
 Now you can [run Sassetti](#running_sassetti) from there or make an
-executable version ("bin/sassetti") of Sassetti with `make bin`.
+executable version ("bin/sassetti") of Sassetti with `make bin`.  You
+can also [install it systemwide](#installing_sassetti_systemwide) with
+`make stow`.
 
 ## Dependencies
 All of the following must be present via quickload.  Fortunately, they
 are all in the standard Quicklisp distribution.
 
 * Sassetti relies on Quicklisp to load dependencies (and itself), so
-  make sure quicklisp is loaded before sassetti, either automatically
+  make sure Quicklisp is loaded before sassetti, either automatically
   or manually.
 
 * Parsing ledger formatted files depends on regular expressions, so
   cl-ppcre needs to be present.
 
-* We use FiveAm for testing.  You can comment it out in the source if
-  you aren't interested in the unit tests.
+* We use FiveAm for testing.  If you don't do `make test` you won't
+  need it and Sassetti won't complain if you don't have it.
 
 * We have a dependency on iterate, but we don't actually use it yet.
 
 * We use split-sequence for some text processing.
+
+* We use command-line-arguments to parse the commandline.
 
 * You'll need GNU Make for the Makefile
 
@@ -47,15 +56,40 @@ The documentation has some dependencies too.
 ## Building the Documentation
 
 Documentation has been collected into a pdf that can be built using
-`make doc`.
+`make doc`.  It also gets build into smaller files and other formats,
+including one suitable for install as a man page.
 
 
+<a name="installing_sassetti_systemwide" />
+
+## Installing Sassetti Systemwide
+
+The best way to install Sassetti at the system level is with [GNU
+Stow](http://www.gnu.org/software/stow/).  This program puts packages
+in individual directories and then adds symlinks to your system so all
+the pieces are where GNU/Linux expects them to be.  And if you ever
+want to upgrade or remove Sassetti, all you have to do is overwrite
+the stow directory and tell stow to reset the symlinks.  Short of
+making a distribution-specific package, GNU Stow is the most reliable
+packaging tool around.  And it's extremely easy to use.
+
+If you have stow installed and put your stow packages at
+`/usr/local/stow`, just do `make; sudo make stow` and everything
+should go right.
 
 <a name="running_sassetti" />
 
 ## Running Sassetti 
 
-Start your lisp environment using `M-x slime` in emacs or `sbcl` at
-the commandline.  Then load Sassetti with `(ql:quickload 'sassetti)`.
-Once Sassetti is loaded, you can invoke it or use any of its
-subroutines as in `(sassetti:sassetti)`.
+You can run Sassetti from the commandline using `sassetti` and
+`sassetti-test`, both of which are placed by make into the `/bin`
+directory of your src distribution.
+
+If you want to run Sassetti interactively, start your lisp environment
+using `M-x slime` in emacs or `sbcl` at the commandline.  Then load
+Sassetti with `(ql:quickload 'sassetti)`.  Once Sassetti is loaded,
+you can invoke it or use any of its subroutines as in
+`(sassetti:sassetti)`.
+
+I haven't yet tested Sassetti with lisp compilers or interpreters
+other than sbcl.

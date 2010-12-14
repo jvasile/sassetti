@@ -22,7 +22,7 @@ dist: all
 	cp $(OUTPUTS) $(DOCDIR)
 ###############################################################################
 $(SOURCES):
-	ln -s ../`echo $@ | sed -e 's/.txt$$//'` $@
+	@ln -s ../$(patsubst %.txt,%,$@) $@
 ###############################################################################
 $(MAN): Makefile $(SOURCES)
 	@csplit -s -f copyright_notice COPYING.txt '/##/'

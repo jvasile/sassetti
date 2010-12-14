@@ -1,4 +1,18 @@
+% SASSETTI(1) Version 0.1 | Sassetti User Manual
+%
+% December 2010
+
 # Introduction
+
+## Name
+
+sassetti - Common Lisp reimplementation of John Wiegley's commandline Ledger program.
+
+## Synopsis
+
+sassetti [options] command [acct-regex]... [-- payee-regex...]
+
+## Description
 
 Sassetti is a Common Lisp reimplementation of John Wiegley's
 commandline Ledger program.  The goal is to harness the power of
@@ -45,3 +59,59 @@ ledger file and perform many of the same functions as Ledger itself.
 Alternatively, Sassetti can generate a new ledger file, which you can
 feed to Ledger (with Ledger's `-f` commandline parameter) or do
 whatever you normally do with those files.
+
+## Commands
+
+All commands require a Sassetti data file which can be specified (in
+order of precedence) with `-f filename` or via the SASSETTI_FILE or
+LEDGER_FILE environment variables. TODO: check the environment
+variables for data files.
+
+### bal, balance
+
+TODO: implement and document balance command.
+
+### reg, register
+
+TODO: implement and document register command.
+
+### parse
+
+Read the Sassetti data file, interpret the lisp in that file as
+needed, and generate a Ledger data file that can be processed by
+Ledger.  This is useful if you are working with Ledger users who are
+not Sassetti-enabled or if you want to take advantage of Ledger
+features Sassetti has not yet implemented.
+
+### print
+
+TODO: implement and document print command.
+
+### xml
+
+TODO: implement and document xml command.
+
+### emacs
+
+TODO: implement and document emacs command.
+
+### equity
+
+TODO: implement and document equity command.
+
+### prices
+
+TODO: implement and document prices command.
+
+### pricedb
+
+TODO: implement and document pricedb command.
+
+### entry
+
+TODO: implement and document entry command
+
+## Options
+
+TODO: Document options
+
