@@ -245,8 +245,14 @@
   (is (equal "$350" (string-form (parse-amount-complex "$350"))))
   )
 
-(defun test-all (&optional argv)
+(defun cmdline-test (&optional argv)
   (declare (ignore argv))
+  (setf *break-on-signals* nil)
+  (if (run! 'sassetti)
+      (sb-ext:quit :unix-status 0)
+      (sb-ext:quit :unix-status 1)))
+
+(defun test-all ()
   (format t "Running tests... this will take some time...~%")
   (setf *break-on-signals* nil)
   (run! 'sassetti)

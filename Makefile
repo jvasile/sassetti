@@ -25,7 +25,7 @@ bin/sassetti-test: sassetti-test.asd *.lisp
 	buildapp \
 	  --load $(SBCL_CONFIG) \
 	  --eval "(ql:quickload 'sassetti-test)" \
-	  --entry sassetti::test-all \
+	  --entry sassetti::cmdline-test \
 	  --output bin/$(BIN)-test || \
 	bash -c 'if [ "`file bin/$(BIN)-test`" == "bin/$(BIN)-test: ASCII text" ]; then rm -f bin/$(BIN)-test; fi'
 test: bin/sassetti-test
@@ -59,6 +59,14 @@ unstow:
 install:
 	@echo Run \'make stow\' to install via GNU stow.  
 	@echo You might need to install and configure stow first \(\'apt-get install stow\'\).
+
+push:
+	bin/sassetti-test | tee  test.results | grep -q "Fail: 0 "
+	echo hi
+
+pushfail:
+	bin/sassetti-test2 | tee  test.results | grep -q "Fail: 0 "; || cat test.results && 0
+	echo hi
 
 clean:
 	$(MAKE) -C doc clean
