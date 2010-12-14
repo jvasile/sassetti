@@ -20,7 +20,7 @@ github](https://github.com/jvasile/sassetti) is at
 
 There are a easy ways to test code before inflicting it on others.
 
-First, run all the unit tests with `(test-all).  If any of them fail,
+First, run all the unit tests with `(test-all)`.  If any of them fail,
 it should mean your changes broke something, as my goal is to always
 keep master in a state where all tests get passed.
 
