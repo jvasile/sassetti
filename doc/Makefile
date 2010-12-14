@@ -37,8 +37,9 @@ $(SOURCES):
 ###############################################################################
 $(MAN): $(SOURCES) ../TODO
 	@csplit -s -f copyright_notice COPYING.mdwn '/##/'
-	$(PANDOC) -s -t man -o $@ $(MAN_SOURCES)
-	@rm copyright_notice0?
+	cat $(MAN_SOURCES) | perl -pe 'BEGIN { $$/=undef } $$_ =~ s/\n\n#\s.*/\n/gm; $$_ =~ s/\n\n#/\n\n/gm; $$_ =~ s/(\n\n#\s.*)/uc($$1)/gme' > .make_man
+	$(PANDOC) -s -t man -o $@ .make_man
+	@rm -f copyright_notice0? .make_man
 manpages: $(MAN)
 ###############################################################################
 %.tex: %.mdwn
