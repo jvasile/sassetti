@@ -22,43 +22,36 @@ can also [install it systemwide](#installing_sassetti_systemwide) with
 `make stow`.
 
 ## Dependencies
-All of the following must be present via quickload.  Fortunately, they
-are all in the standard Quicklisp distribution.
 
-* Sassetti relies on Quicklisp to load dependencies (and itself), so
-  make sure Quicklisp is loaded before sassetti, either automatically
-  or manually.
+* *Ledger* does most of the actual work here.  Sassetti is just a
+   wrapper that makes your data file lisp-capable.  When it's time to
+   do most of the calculation, Sassetti passes a generated
+   Ledger-format data file to Ledger.
 
-* Parsing ledger formatted files depends on regular expressions, so
-  cl-ppcre needs to be present.
+* *QuickLisp* -  Zach Beane's tool for automatically downloading and
+  installing lisp libraries is awesome.  Sassetti relies on QuickLisp
+  to load dependencies (and itself), so make sure QuickLisp is loaded
+  before sassetti, either automatically or manually.  QuickLisp will
+  load cl-ppcre, iterate, split-sequence, and command-line-arguments.
+  If you `make test`, QuickLisp will download FiveAm for testing.
 
-* We use FiveAm for testing.  If you don't do `make test` you won't
-  need it and Sassetti won't complain if you don't have it.
-
-* We have a dependency on iterate, but we don't actually use it yet.
-
-* We use split-sequence for some text processing.
-
-* We use command-line-arguments to parse the commandline.
-
-* You'll need GNU Make for the Makefile
+* *GNU Make* is used to build the binary.
 
 The documentation has some dependencies too.
 
-* Markdown is used to format and style docs.
+* *Markdown* is used to format and style docs.
 
-* Pandoc converts the markdown to different formats.
+* *Pandoc* converts the markdown to different formats.
 
-* PDFLatex generates pdf versions of the documentation.
+* *PDFLatex* generates pdf versions of the documentation.
 
-* GNU make processes /doc/Makefile.
+* *GNU Make* processes /doc/Makefile.
 
 ## Building the Documentation
 
 Documentation has been collected into a pdf that can be built using
-`make doc`.  It also gets build into smaller files and other formats,
+`make doc`.  It also gets built into smaller files and other formats,
 including one suitable for install as a man page.
-
 
 <a name="installing_sassetti_systemwide" />
 
