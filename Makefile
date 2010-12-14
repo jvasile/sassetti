@@ -62,5 +62,5 @@ install:
 
 clean:
 	$(MAKE) -C doc clean
-	rm -rf bin dist
+	rm -rf bin dist *.fasl \#*\#
 

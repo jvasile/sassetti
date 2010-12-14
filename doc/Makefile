@@ -60,3 +60,4 @@ clean: clean-latex
 	rm -rf $(OUTPUTS)
 	rm -f README.txt INSTALL.txt COPYING.txt
 	rm -f copyright_notice0?
+	rm -rf \#*\#
