@@ -13,13 +13,15 @@ HTML=sassetti.html $(patsubst %.txt,%.html,$(SOURCES))
 LATEX=sassetti.tex $(patsubst %.txt,%.tex,$(SOURCES))
 PDF=sassetti.pdf $(patsubst %.txt,%.pdf,$(SOURCES))
 MAN=sassetti.1
+
 OUTPUTS=$(PDF) $(LATEX) $(HTML) $(MAN)
+DIST_OUTPUT=$(patsubst %,$(DOCDIR)/%,$(OUTPUTS))
 
 all: $(OUTPUTS)
 
-dist: all
-	@mkdir -p $(DOCDIR)
-	cp $(OUTPUTS) $(DOCDIR)
+$(DOCDIR)/%: %
+	cp $< $@
+dist: $(DIST_OUTPUT)
 ###############################################################################
 $(SOURCES):
 	@ln -s ../$(patsubst %.txt,%,$@) $@
