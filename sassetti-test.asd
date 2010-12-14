@@ -10,6 +10,7 @@
   :author "James Vasile <james@hackervisions.org>"
   :licence "Copyright 2008 James Vasile, Relesaed under GNU General Public License, Version 3 or later"
   :components ((:file "package-test")
+	       (:file "test")
 	       (:file "util")
 	       (:file "util.test")
                (:file "sassetti")
@@ -17,7 +18,6 @@
 	       (:file "user-funcs")
 	       (:file "user-funcs.test")
 	       (:file "user-designed-funcs")
-	       (:file "test")
 	       )
   :long-description "Sassetti is a Common Lisp reimplementation of
 John Wiegley's commandline ledger program.  The goal is to harness the
