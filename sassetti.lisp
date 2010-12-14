@@ -132,7 +132,6 @@
    ))
 
 (defmethod get-as-list ((self entry))
-  "TODO: handle transactions"
   (list (string-form (date self))
 	(if (effective-date self) (string-form (effective-date self)) nil)
 	(desc self)
