@@ -10,11 +10,9 @@
   :licence "Copyright 2008 James Vasile, Relesaed under GNU General Public License, Version 3 or later"
   :components ((:file "package")
 	       (:file "util")
-	       (:file "util.test")
                (:file "sassetti")
 	       (:file "parse")
 	       (:file "user-funcs")
-	       (:file "user-funcs.test")
 	       (:file "user-designed-funcs")
 	       )
   :long-description "Sassetti is a Common Lisp reimplementation of

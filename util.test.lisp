@@ -9,13 +9,14 @@
 (test cat
   (is (equal "Hello World!" (cat "Hello " "World" "!"))))
 (test trim-whitespace
+  "Test trimming of leading and trailing whitespace"
   (is (equal "T E S T" (trim-whitespace "T E S T")))
-  (is (equal " TEST " (trim-whitespace "TEST")))
-  (is (equal "  TEST  " (trim-whitespace "TEST")))
-  (is (equal " TEST" (trim-whitespace "TEST")))
-  (is (equal "  TEST" (trim-whitespace "TEST")))
-  (is (equal "TEST " (trim-whitespace "TEST")))
-  (is (equal "TEST  " (trim-whitespace "TEST"))))
+  (is (equal "TEST" (trim-whitespace " TEST ")))
+  (is (equal "TEST" (trim-whitespace "  TEST  ")))
+  (is (equal "TEST" (trim-whitespace " TEST")))
+  (is (equal "TEST" (trim-whitespace "  TEST")))
+  (is (equal "TEST" (trim-whitespace "TEST ")))
+  (is (equal "TEST" (trim-whitespace "TEST  "))))
 
 (test rational-from-float-string
   (is (= 2134561/10 (rational-from-float-string "213456.10")))
