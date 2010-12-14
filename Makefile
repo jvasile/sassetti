@@ -10,7 +10,7 @@ default: bin docs dist
 all: default test
 
 ## Content targets
-bin/sassetti: sassetti.asd *.lisp Makefile
+bin/sassetti: sassetti.asd *.lisp
 	@mkdir -p bin
 	buildapp \
 	  --load $(SBCL_CONFIG) \
@@ -20,7 +20,7 @@ bin/sassetti: sassetti.asd *.lisp Makefile
 	bash -c 'if [ "`file bin/$(BIN)`" == "bin/$(BIN): ASCII text" ]; then rm -f bin/$(BIN); fi'
 bin: bin/sassetti
 
-bin/sassetti-test: sassetti-test.asd *.lisp Makefile
+bin/sassetti-test: sassetti-test.asd *.lisp
 	@mkdir -p bin
 	buildapp \
 	  --load $(SBCL_CONFIG) \
