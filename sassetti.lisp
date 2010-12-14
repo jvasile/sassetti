@@ -180,7 +180,7 @@
 
 (defun parse-argv (opt-spec argv)
   (multiple-value-bind (options args) (process-command-line-options opt-spec (cdr argv))
-    (values options (pop args) args (getf options ':FILE)))))
+    (values options (pop args) args (getf options ':FILE))))
 
 (defun main (argv)
   (in-package #:sassetti)
