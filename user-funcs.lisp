@@ -43,8 +43,7 @@
 				  (- term-left 1)
 				  err
 				  (- (+ err err+)
-				     (if (> err+ 1/100) err+. 0)))))))
-
+				     (if (>= err+ 1/100) err+. 0)))))))
 (defun depreciate (year month category total term)
   "Monthly depreciation"
   (let* ((amount (parse-amount total))
