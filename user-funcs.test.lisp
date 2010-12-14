@@ -7,7 +7,6 @@
 (in-suite user-funcs)
 
 (test depreciate
-
   (is (equal
 "2010/10/15 Depreciate Internet access
       Assets:Prepaid:Internet access            -30
@@ -16,10 +15,8 @@
 
 2010/11/15 Depreciate Internet access
       Assets:Prepaid:Internet access            -30
-      Expenses:Depreciation:Internet access     30
-                                                
-
-" (string-form (depreciate 2010 10 "Internet access" 60 2))))
+      Expenses:Depreciation:Internet access     30"
+(trim-whitespace (string-form (depreciate 2010 10 "Internet access" 60 2)))))
 
   (is (equal 
 "2010/10/15 Depreciate 7 month gym membership
@@ -54,9 +51,8 @@
 
 2011/04/15 Depreciate 7 month gym membership
       Assets:Prepaid:7 month gym membership            $-33.72
-      Expenses:Depreciation:7 month gym membership     $33.72
-                                                       
-" (string-form (depreciate 2010 10 "7 month gym membership" $236 7))))
+      Expenses:Depreciation:7 month gym membership     $33.72"
+(trim-whitespace (string-form (depreciate 2010 10 "7 month gym membership" $236 7)))))
 
   (is (equal
 "2010/03/15 Depreciate Bureaucracy:Registered Agent
@@ -116,9 +112,7 @@
 
 2011/02/15 Depreciate Bureaucracy:Registered Agent
       Assets:Prepaid:Bureaucracy:Registered Agent            $-19.59
-      Expenses:Depreciation:Bureaucracy:Registered Agent     $19.59
-
-
-" (string-form (depreciate 2010 03 "Bureaucracy:Registered Agent" $235 12))))
-  )
+      Expenses:Depreciation:Bureaucracy:Registered Agent     $19.59"
+(trim-whitespace (string-form (depreciate 2010 03 "Bureaucracy:Registered Agent" $235 12)))))
+)
 
