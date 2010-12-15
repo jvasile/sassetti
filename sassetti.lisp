@@ -203,3 +203,10 @@
 ;(main '("bin/sassetti" "-f" "/home/vasile/personal/ocs/main.ledger.lisp" "parse"))
 ;(main '("bin/sassetti" "-h" "-d"))
 ;(main '("bin/sassetti" "-v" "test"))
+(progn
+ (princ
+  (with-output-to-string (out)
+    (sb-ext:run-program "ledger" '("--help")
+                        :output out :search t :wait t))
+  *terminal-io*)
+ nil)
