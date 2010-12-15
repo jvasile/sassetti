@@ -13,11 +13,12 @@ doc/*.toc
 doc/sassetti.1
 *.fasl
 doc/COPYING.html
-doc/COPYING.txt
+doc/COPYING.mdwn
 doc/INSTALL.html
-doc/INSTALL.txt
+doc/INSTALL.mdwn
 doc/README.html
-doc/README.txt
+doc/README.mdwn
+doc/TODO.mdwn
 doc/colophon.html
 doc/hacking.html
 doc/sassetti.html
