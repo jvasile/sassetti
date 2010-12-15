@@ -43,6 +43,3 @@ will result from malformed input.  That will change.
 
 * convert sassetti-test to a symlink so we only make one binary
 * write filter (perl? sed?) to demote subtrees for man page
-
-* parse.lisp:  handle dates in the note section
-* parse.lisp:  do we need to trim leading space from the note?

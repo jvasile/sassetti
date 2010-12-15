@@ -6,7 +6,7 @@ PDFLATEX=pdflatex
 
 # List text files in the order in which you want them to appear in the
 # complete manual:
-SOURCES=README.txt INSTALL.txt hacking.txt COPYING.txt colophon.txt
+SOURCES=README.txt INSTALL.txt hacking.txt TODO.txt COPYING.txt colophon.txt
 MAN_SOURCES=$(patsubst COPYING.txt,copyright_notice00,$(SOURCES))
 
 HTML=sassetti.html $(patsubst %.txt,%.html,$(SOURCES))
@@ -24,9 +24,18 @@ $(DOCDIR)/%: %
 dist: $(DIST_OUTPUT)
 ###############################################################################
 $(SOURCES):
+	@rm -f $@
 	@ln -s ../$(patsubst %.txt,%,$@) $@
+../TODO : $(SOURCES) ../*.lisp ../*.asd
+	grep -ro --exclude=.git* --exclude=sassetti.1 --exclude=*.tex --exclude=*.html \
+	     --exclude=README.txt --exclude=INSTALL.txt \
+	     --exclude=TODO.txt --exclude=COPYING.txt \
+	     "TODO\:.*" ../* 2>/dev/null | \
+	     sed -e "s/TODO\://g" | \
+	     sed -e "s/^..\//* /g" \
+	     > ../TODO
 ###############################################################################
-$(MAN): $(SOURCES)
+$(MAN): $(SOURCES) ../TODO
 	@csplit -s -f copyright_notice COPYING.txt '/##/'
 	$(PANDOC) -s -t man -o $@ $(MAN_SOURCES)
 	@rm copyright_notice0?
@@ -35,16 +44,22 @@ manpages: $(MAN)
 %.tex: %.txt
 	$(PANDOC) -s --toc -f markdown --standalone -o $@ $<
 
-sassetti.tex: $(SOURCES)
-	$(PANDOC) -s --toc -f markdown -o sassetti.tex $(SOURCES)
+hacking.tex: hacking.txt ../TODO
+	$(PANDOC) -s --toc -f markdown -o $@ hacking.txt ../TODO
+
+sassetti.tex: $(SOURCES) ../TODO
+	$(PANDOC) -s --toc -f markdown -o $@ $(SOURCES)
 
 latex: $(LATEX)
 ###############################################################################
 %.html: %.txt header.html footer.html style.css
 	$(PANDOC) -s --toc -c style.css -f markdown --standalone -o $@ header.html $< footer.html
 
-sassetti.html: $(SOURCES)
-	$(PANDOC) -s --toc -o sassetti.html -f markdown $(SOURCES)
+hacking.html: hacking.txt ../TODO
+	$(PANDOC) -s --toc -o $@ -f markdown hacking.txt ../TODO
+
+sassetti.html: $(SOURCES) ../TODO
+	$(PANDOC) -s --toc -o $@ -f markdown $(SOURCES)
 
 html: $(HTML)
 ###############################################################################
