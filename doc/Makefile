@@ -74,7 +74,4 @@ clean-latex:
 	rm -rf *.log *.out *.aux *.toc
 
 clean: clean-latex
-	rm -rf $(OUTPUTS)
-	rm -f README.txt INSTALL.txt COPYING.txt
-	rm -f copyright_notice0?
-	rm -rf \#*\#
+	rm -f $(OUTPUTS) README.txt INSTALL.txt TODO.txt COPYING.txt copyright_notice0? \#*\# ../TODO
