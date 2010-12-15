@@ -12,6 +12,7 @@ doc/*.tex
 doc/*.toc
 doc/sassetti.1
 *.fasl
+.make.test.results
 TODO
 doc/COPYING.html
 doc/COPYING.mdwn
