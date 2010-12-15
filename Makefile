@@ -4,6 +4,7 @@ INSTALL_TARGET=/usr/local/stow
 MAKE=make
 STOW=stow
 
+TEST_FILE=.make.test.results
 
 ## Catch-all tagets
 default: bin docs dist
@@ -61,14 +62,14 @@ install:
 	@echo You might need to install and configure stow first \(\'apt-get install stow\'\).
 
 push:
-	bin/sassetti-test | tee  test.results | grep -q "Fail: 0 "
-	echo hi
-
-pushfail:
-	bin/sassetti-test2 | tee  test.results | grep -q "Fail: 0 "; || cat test.results && 0
-	echo hi
+	@git checkout master
+	@rm -f $(TEST_FILE)
+	@bin/sassetti-test | tee $(TEST_FILE)
+	@grep -q "Fail: 0 " $(TEST_FILE)
+	@rm -f $(TEST_FILE)
+	git push
 
 clean:
 	$(MAKE) -C doc clean
-	rm -rf bin dist *.fasl \#*\#
+	rm -rf bin dist *.fasl \#*\# $(TEST_FILE)
 
