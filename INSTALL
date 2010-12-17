@@ -28,12 +28,13 @@ can also [install it systemwide](#installing_sassetti_systemwide) with
    do most of the calculation, Sassetti passes a generated
    Ledger-format data file to Ledger.
 
-* *QuickLisp* -  Zach Beane's tool for automatically downloading and
+* *QuickLisp* - Zach Beane's tool for automatically downloading and
   installing lisp libraries is awesome.  Sassetti relies on QuickLisp
   to load dependencies (and itself), so make sure QuickLisp is loaded
   before sassetti, either automatically or manually.  QuickLisp will
-  load cl-ppcre, iterate, split-sequence, and command-line-arguments.
-  If you `make test`, QuickLisp will download FiveAm for testing.
+  load cl-ppcre, iterate, split-sequence, alexandria and
+  command-line-arguments.  If you `make test`, QuickLisp will download
+  FiveAm for testing.
 
 * *GNU Make* is used to build the binary.
 

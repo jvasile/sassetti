@@ -1,5 +1,6 @@
 (load "tilde.lisp")
+(ql:quickload 'alexandria)
 (ql:quickload 'cl-ppcre)
-(ql:quickload 'iterate)
+;(ql:quickload 'iterate)
 (ql:quickload 'split-sequence)
 (ql:quickload 'COMMAND-LINE-ARGUMENTS)

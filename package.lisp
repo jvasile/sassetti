@@ -4,7 +4,7 @@
   (:use :common-lisp 
 	:command-line-arguments
 	:cl-ppcre 
-	:iterate 
+	:alexandria
 	))
 
 (in-package #:sassetti)     
