@@ -269,6 +269,7 @@
 ; TODO: Add tests for these commandline invocations
 ;(main '("bin/sassetti"))
 ;(main '("bin/sassetti" "-f" "/home/vasile/personal/ocs/main.ledger" "-f" "/home/vasile/personal/ocs/main.ledger.lisp" "parse"))
+;(main '("bin/sassetti" "-f" "/home/vasile/personal/ocs/main.ledger" "-f" "/home/vasile/personal/ocs/main.ledger.lisp" "bal"))
 ;(main '("bin/sassetti" "-f" "/home/vasile/personal/ocs/main.ledger.lisp" "parse"))
 ;(main '("bin/sassetti" "-h" "-d"))
 ;(main '("bin/sassetti" "-v" "test"))
