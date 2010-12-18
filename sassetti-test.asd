@@ -11,6 +11,7 @@
   :licence "Copyright 2008 James Vasile, Relesaed under GNU General Public License, Version 3 or later"
   :components ((:file "package-test")
 	       (:file "test")
+	       (:file "my-osicat")
 	       (:file "util")
 	       (:file "util.test")
                (:file "sassetti")
