@@ -11,8 +11,7 @@
 ;;;; sassetti and its dependencies: (ql:quickload 'sassetti)
 ;;;;
 ;;;; To use this code:
-;;;; Set *ledger-fname* to the path of your ledger file
-;;;; Eval this (position point after s-expression, then C-x C-e): (preprocess-ledger-file *ledger-fname*)
+;;;; Eval this (position point after s-expression, then C-x C-e): (preprocess-ledger-file '("filename"))
 ;;;; Now run ledger on the resulting ledger file.
 ;;;;
 ;;;; Don't forget you can compile forms with C-c C-c
@@ -28,7 +27,6 @@
 
 (in-package #:sassetti)
 
-(defparameter *ledger-fname* "~/personal/ocs/main.ledger.lisp" "Ledger file name")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defgeneric get-as-list (object)
   (:documentation "Return the slots of object as a list.  This is
