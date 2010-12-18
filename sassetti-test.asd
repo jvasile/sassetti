@@ -14,6 +14,7 @@
 	       (:file "my-osicat")
 	       (:file "util")
 	       (:file "util.test")
+	       (:file "model")
                (:file "sassetti")
 	       (:file "parse")
 	       (:file "user-funcs")

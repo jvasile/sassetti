@@ -11,6 +11,7 @@
   :components ((:file "package")
 	       (:file "my-osicat")
 	       (:file "util")
+	       (:file "model")
                (:file "sassetti")
 	       (:file "parse")
 	       (:file "user-funcs")
