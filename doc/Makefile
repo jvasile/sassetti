@@ -71,7 +71,7 @@ pdf: $(PDF)
 ###############################################################################
 
 clean-latex:
-	rm -rf *.log *.out *.aux *.toc
+	rm -f *.log *.out *.aux *.toc
 
 clean: clean-latex
 	rm -f $(OUTPUTS) README.mdwn INSTALL.mdwn TODO.mdwn COPYING.mdwn copyright_notice0? \#*\# ../TODO
